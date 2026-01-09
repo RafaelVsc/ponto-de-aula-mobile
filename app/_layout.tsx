@@ -5,15 +5,18 @@ import {
   ThemeProvider as NavigationThemeProvider,
 } from '@react-navigation/native';
 import { useFonts } from 'expo-font';
-import { Stack } from 'expo-router';
+import { Stack, useRouter, useSegments } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
 import 'react-native-reanimated';
+import { ActivityIndicator } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import '../global.css';
 
 import { ThemeProvider as AppThemeProvider } from '@/components/ThemeProvider';
 import { useColorScheme } from '@/components/useColorScheme';
+import { AppProviders } from '@/core/providers/AppProviders';
+import { useAuth } from '@/core/auth/AuthProvider';
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -22,7 +25,7 @@ export {
 
 export const unstable_settings = {
   // Ensure that reloading on `/modal` keeps a back button present.
-  initialRouteName: '(tabs)',
+  initialRouteName: 'index',
 };
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
@@ -52,7 +55,9 @@ export default function RootLayout() {
   return (
     <AppThemeProvider>
       <SafeAreaProvider>
-        <RootLayoutNav />
+        <AppProviders>
+          <RootLayoutNav />
+        </AppProviders>
       </SafeAreaProvider>
     </AppThemeProvider>
   );
@@ -60,10 +65,33 @@ export default function RootLayout() {
 
 function RootLayoutNav() {
   const colorScheme = useColorScheme();
+  const { isAuthenticated, loading } = useAuth();
+  const segments = useSegments();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (loading) return;
+
+    if (!isAuthenticated) {
+      router.replace('/');
+    } else {
+      router.replace('/(tabs)');
+    }
+  }, [isAuthenticated, loading, router, segments]);
+
+  if (loading) {
+    return (
+      <ActivityIndicator
+        style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}
+        size="large"
+      />
+    );
+  }
 
   return (
     <NavigationThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack>
+      <Stack key={isAuthenticated ? 'auth' : 'guest'}>
+        <Stack.Screen name="index" options={{ headerShown: false }} />
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
       </Stack>

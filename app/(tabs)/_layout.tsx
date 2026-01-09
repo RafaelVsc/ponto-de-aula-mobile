@@ -1,12 +1,13 @@
 import React from 'react';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
-import { Link, Tabs } from 'expo-router';
+import { Link, Tabs, useRouter } from 'expo-router';
 import { Pressable, View } from 'react-native';
 
 import Colors from '@/constants/Colors';
 import { useAppTheme } from '@/components/ThemeProvider';
 import { useColorScheme } from '@/components/useColorScheme';
 import { useClientOnlyValue } from '@/components/useClientOnlyValue';
+import { useAuth } from '@/core/auth/AuthProvider';
 
 // You can explore the built-in icon families and icons on the web at https://icons.expo.fyi/
 function TabBarIcon(props: {
@@ -19,6 +20,13 @@ function TabBarIcon(props: {
 export default function TabLayout() {
   const colorScheme = useColorScheme();
   const { toggleColorScheme } = useAppTheme();
+  const { logout, isAuthenticated } = useAuth();
+  const router = useRouter();
+
+  const handleLogout = async () => {
+    await logout();
+    router.replace('/');
+  };
 
   return (
     <Tabs
@@ -46,17 +54,27 @@ export default function TabLayout() {
                 )}
               </Pressable>
               <Link href="/modal" asChild>
-                <Pressable hitSlop={8}>
+                <Pressable hitSlop={8} style={{ marginRight: 12 }}>
                   {({ pressed }) => (
                     <FontAwesome
                       name="info-circle"
                       size={25}
                       color={Colors[colorScheme ?? 'light'].text}
-                      style={{ marginRight: 15, opacity: pressed ? 0.5 : 1 }}
+                      style={{ opacity: pressed ? 0.5 : 1 }}
                     />
                   )}
                 </Pressable>
               </Link>
+              <Pressable onPress={handleLogout} hitSlop={8}>
+                {({ pressed }) => (
+                  <FontAwesome
+                    name="sign-out"
+                    size={22}
+                    color={Colors[colorScheme ?? 'light'].text}
+                    style={{ marginRight: 15, opacity: pressed ? 0.5 : 1 }}
+                  />
+                )}
+              </Pressable>
             </View>
           ),
         }}
