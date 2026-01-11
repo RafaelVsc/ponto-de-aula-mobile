@@ -1,46 +1,39 @@
 import '@/core/validation/setup';
-import { useState } from 'react';
+import Feather from '@expo/vector-icons/Feather';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Controller, useForm, type FieldErrors } from 'react-hook-form';
-import { ActivityIndicator, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
+import { useRouter } from 'expo-router';
+import { useState } from 'react';
+import { Controller, useForm } from 'react-hook-form';
+import { ActivityIndicator, Pressable, Text, View } from 'react-native';
 import Toast from 'react-native-toast-message';
 
+import { Input } from '@/components/ui/Input';
 import { useAuth } from '@/core/auth/AuthProvider';
 import { login } from '@/core/services/auth.service';
-import { LoginSchema, type LoginFormValues } from '../core/validation/auth';
+import { LoginSchema, type LoginFormValues } from '@/core/validation/auth';
 
 export default function LoginScreen() {
+  const router = useRouter();
   const { setSession, loading: authLoading } = useAuth();
+  const [submitting, setSubmitting] = useState(false);
 
   const {
     control,
     handleSubmit,
+    setValue,
     formState: { errors },
   } = useForm<LoginFormValues>({
     resolver: zodResolver(LoginSchema),
     defaultValues: { identifier: '', password: '' },
   });
 
-  const [submitting, setSubmitting] = useState(false);
-
-  const onInvalid = (formErrors: FieldErrors<LoginFormValues>) => {
-    const firstError = formErrors.identifier?.message ?? formErrors.password?.message;
-    if (firstError) {
-      Toast.show({
-        type: 'error',
-        text1: 'Dados inválidos',
-        text2: firstError,
-      });
-    }
-  };
-
-  const submit = handleSubmit(async (values) => {
+  const onSubmit = handleSubmit(async (values) => {
     if (submitting) return;
     setSubmitting(true);
     try {
       const data = await login(values);
       await setSession(data);
-      // Redirecionamento é automático pelo _layout.tsx ao detectar isAuthenticated=true
+      router.replace('/(tabs)');
     } catch (err) {
       console.log('[login:error]', err);
       Toast.show({
@@ -51,136 +44,109 @@ export default function LoginScreen() {
     } finally {
       setSubmitting(false);
     }
-  }, onInvalid);
+  });
+
+  const fillDevCredentials = (role: 'admin' | 'student') => {
+    if (role === 'admin') {
+      setValue('identifier', 'admin@pontodeaula.com');
+      setValue('password', '12345678');
+    } else {
+      setValue('identifier', 'aluno@pontodeaula.com');
+      setValue('password', '12345678');
+    }
+  };
 
   if (authLoading) {
     return (
-      <View style={styles.center}>
+      <View className="flex-1 items-center justify-center bg-slate-50">
         <ActivityIndicator />
       </View>
     );
   }
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Entrar</Text>
+    <View className="flex-1 justify-center bg-slate-50 px-6 py-12">
+      <View className="items-center mb-8">
+        <View className="mb-4 h-16 w-16 items-center justify-center rounded-xl bg-slate-900">
+          <Feather name="book-open" size={32} color="white" />
+        </View>
+        <Text className="text-2xl font-bold text-slate-900">Ponto de Aula</Text>
+        <Text className="text-slate-500">Faça login para continuar</Text>
+      </View>
 
-      <View style={styles.field}>
-        <Text style={styles.label}>E-mail ou usuário</Text>
+      <View className="rounded-xl border border-slate-100 bg-white p-6 shadow-sm">
         <Controller
           control={control}
           name="identifier"
           render={({ field: { onChange, onBlur, value } }) => (
-            <TextInput
-              style={[styles.input, errors.identifier && styles.inputError]}
-              placeholder="admin@pontodeaula.com"
-              autoCapitalize="none"
+            <Input
+              label="E-mail ou usuário"
+              placeholder="ex: voce@escola.com"
+              icon="mail"
               onBlur={onBlur}
               onChangeText={onChange}
               value={value}
+              error={errors.identifier?.message}
+              autoCapitalize="none"
+              autoCorrect={false}
+              keyboardType="email-address"
             />
           )}
         />
-        {errors.identifier && <Text style={styles.errorText}>{errors.identifier.message}</Text>}
-      </View>
 
-      <View style={styles.field}>
-        <Text style={styles.label}>Senha</Text>
         <Controller
           control={control}
           name="password"
           render={({ field: { onChange, onBlur, value } }) => (
-            <TextInput
-              style={[styles.input, errors.password && styles.inputError]}
+            <Input
+              label="Senha"
               placeholder="••••••••"
-              secureTextEntry
+              isPassword
+              icon="lock"
               onBlur={onBlur}
               onChangeText={onChange}
               value={value}
+              error={errors.password?.message}
             />
           )}
         />
-        {errors.password && <Text style={styles.errorText}>{errors.password.message}</Text>}
+
+        <Pressable
+          className={`mt-2 items-center justify-center rounded-lg bg-slate-900 py-3.5 active:opacity-90 ${
+            submitting ? 'opacity-70' : ''
+          }`}
+          onPress={onSubmit}
+          disabled={submitting}
+        >
+          {submitting ? (
+            <ActivityIndicator color="white" />
+          ) : (
+            <Text className="font-semibold text-white">Entrar</Text>
+          )}
+        </Pressable>
       </View>
 
-      <Pressable
-        style={[styles.button, submitting && styles.buttonDisabled]}
-        onPress={() =>
-          submit().catch((err) => {
-            // Evita promessa não tratada em caso de erro de validação ou resolver.
-            console.log('[login:submit-error]', err);
-            Toast.show({
-              type: 'error',
-              text1: 'Dados inválidos',
-              text2: 'Revise os campos e tente novamente.',
-            });
-          })
-        }
-        disabled={submitting}>
-        {submitting ? <ActivityIndicator color="#fff" /> : <Text style={styles.buttonText}>Entrar</Text>}
-      </Pressable>
+      {__DEV__ && (
+        <View className="mt-8 border-t border-slate-200 pt-6">
+          <Text className="mb-3 text-center text-xs font-bold uppercase tracking-wider text-slate-400">
+            Acesso rápido (DEV)
+          </Text>
+          <View className="flex-row justify-center gap-3">
+            <Pressable
+              onPress={() => fillDevCredentials('admin')}
+              className="rounded-full bg-blue-100 px-4 py-2"
+            >
+              <Text className="text-xs font-bold text-blue-700">Professor</Text>
+            </Pressable>
+            <Pressable
+              onPress={() => fillDevCredentials('student')}
+              className="rounded-full bg-green-100 px-4 py-2"
+            >
+              <Text className="text-xs font-bold text-green-700">Aluno</Text>
+            </Pressable>
+          </View>
+        </View>
+      )}
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 24,
-    justifyContent: 'center',
-    backgroundColor: '#f9fafb',
-  },
-  center: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#f9fafb',
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 24,
-    color: '#111827',
-    textAlign: 'center',
-  },
-  field: {
-    marginBottom: 16,
-  },
-  label: {
-    fontSize: 14,
-    color: '#4b5563',
-    marginBottom: 6,
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: '#e5e7eb',
-    borderRadius: 8,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    backgroundColor: '#fff',
-    color: '#111827',
-  },
-  inputError: {
-    borderColor: '#ef4444',
-  },
-  errorText: {
-    color: '#ef4444',
-    fontSize: 12,
-    marginTop: 4,
-  },
-  button: {
-    marginTop: 8,
-    backgroundColor: '#1e3a8a',
-    paddingVertical: 12,
-    borderRadius: 10,
-    alignItems: 'center',
-  },
-  buttonDisabled: {
-    opacity: 0.7,
-  },
-  buttonText: {
-    color: '#f9fafb',
-    fontSize: 16,
-    fontWeight: '600',
-  },
-});
