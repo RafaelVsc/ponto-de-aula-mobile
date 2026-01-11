@@ -33,7 +33,7 @@ export default function LoginScreen() {
     try {
       const data = await login(values);
       await setSession(data);
-      router.replace('/(tabs)');
+      router.replace('/(app)/(tabs)');
     } catch (err) {
       console.log('[login:error]', err);
       Toast.show({
@@ -51,7 +51,7 @@ export default function LoginScreen() {
       setValue('identifier', 'admin@pontodeaula.com');
       setValue('password', '12345678');
     } else {
-      setValue('identifier', 'aluno@pontodeaula.com');
+      setValue('identifier', 'student2025');
       setValue('password', '12345678');
     }
   };
@@ -136,7 +136,7 @@ export default function LoginScreen() {
               onPress={() => fillDevCredentials('admin')}
               className="rounded-full bg-blue-100 px-4 py-2"
             >
-              <Text className="text-xs font-bold text-blue-700">Professor</Text>
+              <Text className="text-xs font-bold text-blue-700">Admin</Text>
             </Pressable>
             <Pressable
               onPress={() => fillDevCredentials('student')}

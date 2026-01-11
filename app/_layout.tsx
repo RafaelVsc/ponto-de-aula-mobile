@@ -5,7 +5,7 @@ import {
   ThemeProvider as NavigationThemeProvider,
 } from '@react-navigation/native';
 import { useFonts } from 'expo-font';
-import { Stack } from 'expo-router';
+import { Slot, Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
 import 'react-native-reanimated';
@@ -77,17 +77,14 @@ function RootLayoutNav() {
   }
 
   return (
-    <NavigationThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      {isAuthenticated ? (
-        <Stack key="auth">
-          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-          <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
-        </Stack>
-      ) : (
-        <Stack key="guest">
-          <Stack.Screen name="index" options={{ headerShown: false }} />
-        </Stack>
-      )}
+    <NavigationThemeProvider
+      key={isAuthenticated ? 'auth-theme' : 'guest-theme'}
+      value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}
+    >
+      <Stack screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="(auth)" />
+        <Stack.Screen name="(app)" />
+      </Stack>
     </NavigationThemeProvider>
   );
 }

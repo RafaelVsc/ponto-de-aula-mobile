@@ -23,9 +23,14 @@ export default function TabLayout() {
   const { logout, isAuthenticated } = useAuth();
   const router = useRouter();
 
+  if (!isAuthenticated) {
+    // Layout não deve renderizar tabs quando deslogado; o root layout troca para stack guest.
+    return null;
+  }
+
   const handleLogout = async () => {
     await logout();
-    router.replace('/');
+    router.replace('/(auth)');
   };
 
   return (
@@ -53,7 +58,7 @@ export default function TabLayout() {
                   />
                 )}
               </Pressable>
-              <Link href="/modal" asChild>
+              <Link href="/(app)/modal" asChild>
                 <Pressable hitSlop={8} style={{ marginRight: 12 }}>
                   {({ pressed }) => (
                     <FontAwesome
