@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import { Pressable, Text, TextInput, type TextInputProps, View } from 'react-native';
 import Feather from '@expo/vector-icons/Feather';
-import colors from 'tailwindcss/colors';
 
 import { cn } from '@/lib/utils';
+import Colors from '@/constants/Colors';
+import { useColorScheme } from '@/components/useColorScheme';
 
 interface InputProps extends TextInputProps {
   label?: string;
@@ -23,33 +24,37 @@ export function Input({
 }: InputProps) {
   const [isFocused, setIsFocused] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const colorScheme = useColorScheme() ?? 'light';
+  const palette = Colors[colorScheme];
 
   const secureTextEntry = isPassword && !showPassword;
 
   return (
     <View className="w-full">
-      {label && <Text className="mb-1.5 text-sm font-medium text-slate-700">{label}</Text>}
+      {label && <Text className="mb-1.5 text-sm font-medium text-foreground">{label}</Text>}
 
       <View
         className={cn(
-          'flex-row items-center rounded-lg border bg-white px-3',
-          isFocused ? 'border-slate-900 ring-2 ring-slate-200' : 'border-slate-200',
-          error && 'border-red-500 ring-0',
+          'flex-row items-center rounded-lg border bg-card px-3',
           className
         )}
+        style={{
+          borderColor: error ? palette.destructive : isFocused ? palette.ring : palette.border,
+          borderWidth: 1,
+        }}
       >
         {icon && (
           <Feather
             name={icon}
             size={20}
-            color={error ? colors.red[500] : colors.slate[400]}
+            color={error ? palette.destructive : palette.muted}
             style={{ marginRight: 8 }}
           />
         )}
 
         <TextInput
-          className="flex-1 py-3 text-base leading-none text-slate-900"
-          placeholderTextColor={colors.slate[400]}
+          className="flex-1 py-3 text-base leading-none text-foreground"
+          placeholderTextColor={palette.mutedForeground}
           onFocus={() => setIsFocused(true)}
           onBlur={() => setIsFocused(false)}
           secureTextEntry={secureTextEntry}
@@ -62,7 +67,7 @@ export function Input({
             <Feather
               name={showPassword ? 'eye' : 'eye-off'}
               size={20}
-              color={colors.slate[400]}
+              color={palette.muted}
             />
           </Pressable>
         )}

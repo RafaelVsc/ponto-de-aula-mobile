@@ -1,42 +1,56 @@
-import { StyleSheet } from 'react-native';
-
-import EditScreenInfo from '@/components/EditScreenInfo';
-import { Text, View } from '@/components/Themed';
+import { PostCard } from '@/components/posts/PostCard';
 import { useAuth } from '@/core/auth/AuthProvider';
+import { fetchPosts } from '@/core/services/post.service';
+import type { Post } from '@/core/types';
+import { useQuery } from '@tanstack/react-query';
+import { ActivityIndicator, FlatList, RefreshControl, Text, View } from 'react-native';
 
-export default function TabOneScreen() {
+export default function FeedScreen() {
   const { user } = useAuth();
-  const name = user?.name ?? 'usuário';
-  const role = user?.role ?? '';
+  const name = user?.name ?? 'Usuário';
+
+  const {
+    data,
+    isLoading,
+    isRefetching,
+    refetch,
+    isError,
+  } = useQuery({
+    queryKey: ['posts', 'feed'],
+    queryFn: () => fetchPosts(),
+  });
+
+  const posts: Post[] = data?.data ?? [];
+
+  if (isLoading) {
+    return (
+      <View className="flex-1 items-center justify-center bg-background">
+        <ActivityIndicator size="large" />
+      </View>
+    );
+  }
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Bem-vindo, {name}</Text>
-      {!!role && <Text style={styles.subtitle}>Role: {role}</Text>}
-      <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
-      <EditScreenInfo path="app/(tabs)/index.tsx" />
+    <View className="flex-1 bg-background px-4 py-6">
+      <Text className="mb-4 text-2xl font-bold text-foreground">Olá, {name}</Text>
+
+      <FlatList
+        data={posts}
+        keyExtractor={(item) => item.id}
+        renderItem={({ item }) => <PostCard post={item} />}
+        contentContainerStyle={{ paddingBottom: 32 }}
+        showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl refreshing={isRefetching} onRefresh={refetch} />
+        }
+        ListEmptyComponent={
+          <View className="mt-8 items-center">
+            <Text className="text-sm text-muted-foreground">
+              {isError ? 'Não foi possível carregar os posts.' : 'Nenhum post encontrado.'}
+            </Text>
+          </View>
+        }
+      />
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  title: {
-    fontSize: 20,
-    fontWeight: 'bold',
-  },
-  subtitle: {
-    fontSize: 14,
-    color: '#4b5563',
-    marginTop: 4,
-  },
-  separator: {
-    marginVertical: 30,
-    height: 1,
-    width: '80%',
-  },
-});

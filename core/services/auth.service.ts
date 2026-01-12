@@ -1,14 +1,9 @@
 import type { AuthUser } from '../auth/AuthProvider';
 import { api, setAuthToken } from '../api/client';
 import type { LoginFormValues } from '../validation/auth';
+import type { ApiResponse } from '../types';
 
 export type LoginPayload = LoginFormValues;
-
-type ApiResponse<T> = {
-  status?: string;
-  message?: string;
-  data: T;
-};
 
 export type LoginData = {
   token: string;

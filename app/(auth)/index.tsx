@@ -4,9 +4,12 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
-import { ActivityIndicator, Pressable, Text, View } from 'react-native';
+import { ActivityIndicator, Text, View } from 'react-native';
+import 'react-native-reanimated';
 import Toast from 'react-native-toast-message';
+import { ZodError } from 'zod';
 
+import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { useAuth } from '@/core/auth/AuthProvider';
 import { login } from '@/core/services/auth.service';
@@ -27,12 +30,25 @@ export default function LoginScreen() {
     defaultValues: { identifier: '', password: '' },
   });
 
+  const onInvalid = (formErrors: any) => {
+    // Pega a primeira mensagem de erro disponível para exibir no Toast
+    const firstError = formErrors.identifier?.message ?? formErrors.password?.message;
+    if (firstError) {
+      Toast.show({
+        type: 'error',
+        text1: 'Dados inválidos',
+        text2: firstError,
+      });
+    }
+  };
+
   const onSubmit = handleSubmit(async (values) => {
     if (submitting) return;
     setSubmitting(true);
     try {
       const data = await login(values);
       await setSession(data);
+      // O redirecionamento é handled pelo RootLayout ou AuthProvider
       router.replace('/(app)/(tabs)');
     } catch (err) {
       console.log('[login:error]', err);
@@ -44,7 +60,31 @@ export default function LoginScreen() {
     } finally {
       setSubmitting(false);
     }
-  });
+  }, onInvalid);
+
+  // Garante captura de qualquer exceção inesperada do resolver/Zod
+  const triggerSubmit = async () => {
+    try {
+      await onSubmit();
+    } catch (err: any) {
+      // Evita logar no console para erros esperados de validação
+      const isZod = err instanceof ZodError || err?.name === 'ZodError';
+      const firstError =
+        err?.errors?.[0]?.message ??
+        err?.issues?.[0]?.message ??
+        'Preencha os campos obrigatórios.';
+
+      Toast.show({
+        type: 'error',
+        text1: 'Dados inválidos',
+        text2: firstError,
+      });
+
+      if (!isZod) {
+        console.error('[login:submit-error]', err);
+      }
+    }
+  };
 
   const fillDevCredentials = (role: 'admin' | 'student') => {
     if (role === 'admin') {
@@ -58,23 +98,23 @@ export default function LoginScreen() {
 
   if (authLoading) {
     return (
-      <View className="flex-1 items-center justify-center bg-slate-50">
-        <ActivityIndicator />
+      <View className="flex-1 items-center justify-center bg-background">
+        <ActivityIndicator size="large" />
       </View>
     );
   }
 
   return (
-    <View className="flex-1 justify-center bg-slate-50 px-6 py-12">
+    <View className="flex-1 justify-center bg-background px-6 py-12">
       <View className="items-center mb-8">
-        <View className="mb-4 h-16 w-16 items-center justify-center rounded-xl bg-slate-900">
-          <Feather name="book-open" size={32} color="white" />
+        <View className="mb-4 h-16 w-16 items-center justify-center rounded-lg bg-primary shadow-sm">
+          <Feather name="book-open" size={32} color="#f9fafb" />
         </View>
-        <Text className="text-2xl font-bold text-slate-900">Ponto de Aula</Text>
-        <Text className="text-slate-500">Faça login para continuar</Text>
+        <Text className="text-2xl font-bold text-foreground">Ponto de Aula</Text>
+        <Text className="text-muted-foreground mt-2">Faça login para continuar</Text>
       </View>
 
-      <View className="rounded-xl border border-slate-100 bg-white p-6 shadow-sm">
+      <View className="rounded-lg border border-border bg-card p-6 shadow-sm">
         <Controller
           control={control}
           name="identifier"
@@ -94,6 +134,8 @@ export default function LoginScreen() {
           )}
         />
 
+        <View className="h-4" />
+
         <Controller
           control={control}
           name="password"
@@ -111,39 +153,34 @@ export default function LoginScreen() {
           )}
         />
 
-        <Pressable
-          className={`mt-2 items-center justify-center rounded-lg bg-slate-900 py-3.5 active:opacity-90 ${
-            submitting ? 'opacity-70' : ''
-          }`}
-          onPress={onSubmit}
+        <View className="h-6" />
+
+        <Button
+          label="Entrar"
+          onPress={triggerSubmit}
+          loading={submitting}
           disabled={submitting}
-        >
-          {submitting ? (
-            <ActivityIndicator color="white" />
-          ) : (
-            <Text className="font-semibold text-white">Entrar</Text>
-          )}
-        </Pressable>
+        />
       </View>
 
       {__DEV__ && (
-        <View className="mt-8 border-t border-slate-200 pt-6">
-          <Text className="mb-3 text-center text-xs font-bold uppercase tracking-wider text-slate-400">
+        <View className="mt-8 border-t border-border pt-6">
+          <Text className="mb-3 text-center text-xs font-bold uppercase tracking-wider text-muted-foreground">
             Acesso rápido (DEV)
           </Text>
           <View className="flex-row justify-center gap-3">
-            <Pressable
+            <Button
+              size="sm"
+              variant="secondary"
+              label="Admin"
               onPress={() => fillDevCredentials('admin')}
-              className="rounded-full bg-blue-100 px-4 py-2"
-            >
-              <Text className="text-xs font-bold text-blue-700">Admin</Text>
-            </Pressable>
-            <Pressable
+            />
+            <Button
+              size="sm"
+              variant="secondary"
+              label="Aluno"
               onPress={() => fillDevCredentials('student')}
-              className="rounded-full bg-green-100 px-4 py-2"
-            >
-              <Text className="text-xs font-bold text-green-700">Aluno</Text>
-            </Pressable>
+            />
           </View>
         </View>
       )}
