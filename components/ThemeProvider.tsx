@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useEffect, useMemo, useState } from 'react';
-import { ColorSchemeName, useColorScheme as useSystemColorScheme, View } from 'react-native';
+import { ColorSchemeName, useColorScheme as useSystemColorScheme } from 'react-native';
 import { useColorScheme as useNativeWindColorScheme } from 'nativewind';
 
 type ThemeContextValue = {
@@ -25,14 +25,11 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   );
 
   useEffect(() => {
+    // Sincroniza o esquema de cores do NativeWind (darkMode: 'class')
     nativewind.setColorScheme(colorScheme as 'light' | 'dark');
   }, [colorScheme, nativewind]);
 
-  return (
-    <ThemeContext.Provider value={value}>
-      <View className={colorScheme === 'dark' ? 'dark flex-1' : 'flex-1'}>{children}</View>
-    </ThemeContext.Provider>
-  );
+  return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;
 }
 
 export function useAppTheme() {
