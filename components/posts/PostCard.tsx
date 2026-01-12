@@ -59,6 +59,13 @@ export function PostCard({ post, onPress, className }: PostCardProps) {
                 </Text>
               </View>
             ))}
+            {post.tags.length > 2 && (
+              <View className="rounded-md bg-slate-900/60 px-2 py-1">
+                <Text className="text-[10px] font-bold text-white">
+                  +{post.tags.length - 2}
+                </Text>
+              </View>
+            )}
           </View>
         )}
       </View>
