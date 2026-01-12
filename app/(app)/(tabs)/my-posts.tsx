@@ -20,18 +20,18 @@ export default function MyPostsScreen() {
 
   if (isLoading) {
     return (
-      <View className="flex-1 items-center justify-center bg-background px-4">
+      <View className="flex-1 items-center justify-center bg-background dark:bg-background-dark px-4">
         <ActivityIndicator size="large" />
       </View>
     );
   }
 
   return (
-    <View className="flex-1 bg-background px-4 py-6">
-      <Text className="mb-4 text-2xl font-bold text-foreground">
+    <View className="flex-1 bg-background dark:bg-background-dark px-4 py-6">
+      <Text className="mb-4 text-2xl font-bold text-foreground dark:text-foreground-dark">
         Meus posts
       </Text>
-      <Text className="mb-6 text-sm text-muted-foreground">
+      <Text className="mb-6 text-sm text-muted-foreground dark:text-muted-foreground-dark">
         {`Olá, ${name}. Aqui estão os posts que você publicou.`}
       </Text>
 
@@ -45,8 +45,8 @@ export default function MyPostsScreen() {
           <RefreshControl refreshing={isRefetching} onRefresh={refetch} />
         }
         ListEmptyComponent={
-          <View>
-            <Text>
+          <View className="mt-4">
+            <Text className="text-sm text-muted-foreground dark:text-muted-foreground-dark text-center">
               {isError
                 ? 'Não foi possível carregar seus posts.'
                 : 'Você ainda não publicou posts.'}

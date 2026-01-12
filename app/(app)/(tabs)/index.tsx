@@ -24,15 +24,17 @@ export default function FeedScreen() {
 
   if (isLoading) {
     return (
-      <View className="flex-1 items-center justify-center bg-background">
+      <View className="flex-1 items-center justify-center bg-background dark:bg-background-dark">
         <ActivityIndicator size="large" />
       </View>
     );
   }
 
   return (
-    <View className="flex-1 bg-background px-4 py-6">
-      <Text className="mb-4 text-2xl font-bold text-foreground">Olá, {name}</Text>
+    <View className="flex-1 bg-background dark:bg-background-dark px-4 py-6">
+      <Text className="mb-4 text-2xl font-bold text-foreground dark:text-foreground-dark">
+        Olá, {name}
+      </Text>
 
       <FlatList
         data={posts}
@@ -45,7 +47,7 @@ export default function FeedScreen() {
         }
         ListEmptyComponent={
           <View className="mt-8 items-center">
-            <Text className="text-sm text-muted-foreground">
+            <Text className="text-sm text-muted-foreground dark:text-muted-foreground-dark">
               {isError ? 'Não foi possível carregar os posts.' : 'Nenhum post encontrado.'}
             </Text>
           </View>

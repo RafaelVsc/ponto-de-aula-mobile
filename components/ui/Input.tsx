@@ -20,6 +20,7 @@ export function Input({
   icon,
   isPassword,
   className,
+  accessibilityLabel,
   ...props
 }: InputProps) {
   const [isFocused, setIsFocused] = useState(false);
@@ -59,6 +60,7 @@ export function Input({
           onBlur={() => setIsFocused(false)}
           secureTextEntry={secureTextEntry}
           autoCapitalize="none"
+          accessibilityLabel={accessibilityLabel ?? label ?? props.placeholder}
           {...props}
         />
 

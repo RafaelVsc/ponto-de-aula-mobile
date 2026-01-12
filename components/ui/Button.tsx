@@ -62,6 +62,7 @@ export function Button({
   children,
   loading,
   disabled,
+  accessibilityLabel,
   ...props
 }: ButtonProps) {
   const colorScheme = useColorScheme() ?? 'light';
@@ -81,6 +82,8 @@ export function Button({
         (disabled || loading) && 'opacity-50'
       )}
       disabled={disabled || loading}
+      accessibilityRole="button"
+      accessibilityLabel={accessibilityLabel ?? label}
       {...props}
     >
       {loading ? (
