@@ -112,6 +112,25 @@ export default function PostDetailScreen() {
           ),
         }}
       />
+      <Pressable
+        onPress={() => router.back()}
+        hitSlop={8}
+        style={{
+          flexDirection: "row",
+          alignItems: "center",
+          marginBottom: 12,
+          gap: 6,
+        }}
+      >
+        <FontAwesome
+          name="chevron-left"
+          size={16}
+          color={Colors[colorScheme ?? "light"].text}
+        />
+        <Text className="text-base font-medium text-foreground">
+          Voltar
+        </Text>
+      </Pressable>
       <PostBody
         post={post}
         plainContent={plainContent}
