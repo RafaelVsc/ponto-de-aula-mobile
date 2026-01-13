@@ -1,6 +1,9 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useColorScheme as useNativeWindColorScheme } from 'nativewind';
 import React, { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import { ColorSchemeName, useColorScheme as useSystemColorScheme } from 'react-native';
-import { useColorScheme as useNativeWindColorScheme } from 'nativewind';
+
+const THEME_STORAGE_KEY = '@PontoDeAula:theme';
 
 type ThemeContextValue = {
   colorScheme: NonNullable<ColorSchemeName>;
@@ -12,22 +15,62 @@ const ThemeContext = createContext<ThemeContextValue | undefined>(undefined);
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const systemScheme = useSystemColorScheme() ?? 'light';
-  const [colorScheme, setColorScheme] = useState<NonNullable<ColorSchemeName>>(systemScheme);
-  const nativewind = useNativeWindColorScheme();
+  const { setColorScheme: setNativeWindScheme } = useNativeWindColorScheme();
+  
+  // Inicia com undefined para saber que ainda não carregou do storage
+  const [colorScheme, setColorSchemeState] = useState<NonNullable<ColorSchemeName> | undefined>(undefined);
+
+  // 1. Carregar tema salvo ao iniciar
+  useEffect(() => {
+    const loadTheme = async () => {
+      try {
+        const savedTheme = await AsyncStorage.getItem(THEME_STORAGE_KEY);
+        if (savedTheme === 'dark' || savedTheme === 'light') {
+          setColorSchemeState(savedTheme);
+          setNativeWindScheme(savedTheme);
+        } else {
+          // Se não tem salvo, usa o do sistema
+          setColorSchemeState(systemScheme);
+          setNativeWindScheme(systemScheme);
+        }
+      } catch (error) {
+        console.log('Erro ao carregar tema:', error);
+        setColorSchemeState(systemScheme);
+      }
+    };
+    loadTheme();
+  }, []); // Executa apenas uma vez no mount
+
+  // 2. Função para alterar e salvar o tema
+  const setTheme = async (newTheme: NonNullable<ColorSchemeName>) => {
+    setColorSchemeState(newTheme);
+    setNativeWindScheme(newTheme);
+    try {
+      await AsyncStorage.setItem(THEME_STORAGE_KEY, newTheme);
+    } catch (error) {
+      console.log('Erro ao salvar tema:', error);
+    }
+  };
+
+  const toggleColorScheme = async () => {
+    const newTheme = colorScheme === 'dark' ? 'light' : 'dark';
+    await setTheme(newTheme);
+  };
 
   const value = useMemo(
     () => ({
-      colorScheme,
-      setColorScheme,
-      toggleColorScheme: () => setColorScheme((prev) => (prev === 'dark' ? 'light' : 'dark')),
+      colorScheme: colorScheme ?? systemScheme, // Fallback visual enquanto carrega
+      setColorScheme: setTheme,
+      toggleColorScheme,
     }),
-    [colorScheme]
+    [colorScheme, systemScheme]
   );
 
-  useEffect(() => {
-    // Sincroniza o esquema de cores do NativeWind (darkMode: 'class')
-    nativewind.setColorScheme(colorScheme as 'light' | 'dark');
-  }, [colorScheme, nativewind]);
+  // Evita renderizar children com tema errado (opcional, mas evita flicker drástico)
+  // Se quiser renderizar instantâneo assumindo system, remova este if.
+  if (colorScheme === undefined) {
+    return null; 
+  }
 
   return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;
 }

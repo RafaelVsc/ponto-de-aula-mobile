@@ -3,6 +3,7 @@ import { useAuth } from '@/core/auth/AuthProvider';
 import { fetchPosts } from '@/core/services/post.service';
 import type { Post } from '@/core/types';
 import { useQuery } from '@tanstack/react-query';
+import { router } from 'expo-router';
 import { ActivityIndicator, FlatList, RefreshControl, Text, View } from 'react-native';
 
 export default function FeedScreen() {
@@ -39,7 +40,7 @@ export default function FeedScreen() {
       <FlatList
         data={posts}
         keyExtractor={(item) => item.id}
-        renderItem={({ item }) => <PostCard post={item} />}
+        renderItem={({ item }) => <PostCard post={item} onPress={() => router.push(`/(app)/posts/${item.id}`)}/>}
         contentContainerStyle={{ paddingBottom: 32 }}
         showsVerticalScrollIndicator={false}
         refreshControl={

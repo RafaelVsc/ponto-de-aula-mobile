@@ -1,8 +1,8 @@
 import { api } from '../api/client';
 import type {
-    ApiResponse,
-    Post,
-    PostSearchParams
+  ApiResponse,
+  Post,
+  PostSearchParams
 } from '../types/index';
 
 const BASE_URL = '/posts';
@@ -17,9 +17,9 @@ export async function fetchMyPosts(): Promise<ApiResponse<Post[]>> {
 }
 
 // // Detalhe de post
-// export async function fetchPostById(id: string): Promise<ApiResponse<Post>> {
-//   return api.get<ApiResponse<Post>>(`${BASE_URL}/${id}`);
-// }
+export async function fetchPostById(id: string): Promise<ApiResponse<Post>> {
+  return api.get<ApiResponse<Post>>(`${BASE_URL}/${id}`);
+}
 
 // // Criar post
 // export async function createPost(payload: CreatePostPayload): Promise<ApiResponse<Post>> {
@@ -34,7 +34,7 @@ export async function fetchMyPosts(): Promise<ApiResponse<Post[]>> {
 //   return api.put<ApiResponse<Post>>(`${BASE_URL}/${id}`, payload);
 // }
 
-// // Remover post
-// export async function deletePost(id: string): Promise<ApiResponse<{ id: string }>> {
-//   return api.delete<ApiResponse<{ id: string }>>(`${BASE_URL}/${id}`);
-// }
+// Remover post
+export async function deletePost(id: string): Promise<ApiResponse<{ id: string }>> {
+  return api.delete<ApiResponse<{ id: string }>>(`${BASE_URL}/${id}`);
+}

@@ -72,13 +72,13 @@ function RootLayoutNav() {
   }
 
   return (
-    <NavigationThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <View className={colorScheme === 'dark' ? 'dark flex-1' : 'flex-1'}>
-        <Stack screenOptions={{ headerShown: false }}>
-          <Stack.Screen name="(auth)" />
-          <Stack.Screen name="(app)" />
+    <View className={colorScheme === 'dark' ? 'dark flex-1' : 'flex-1'}>
+      <NavigationThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+        <Stack>
+          <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+          <Stack.Screen name="(app)" options={{ headerShown: false }} />
         </Stack>
-      </View>
-    </NavigationThemeProvider>
+      </NavigationThemeProvider>
+    </View>
   );
 }

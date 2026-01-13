@@ -4,6 +4,7 @@ import { ActivityIndicator, FlatList, RefreshControl, Text, View } from 'react-n
 import { PostCard } from '@/components/posts/PostCard';
 import { useAuth } from '@/core/auth/AuthProvider';
 import { fetchMyPosts } from '@/core/services/post.service';
+import { router } from 'expo-router';
 
 export default function MyPostsScreen() {
   const { user } = useAuth();
@@ -38,7 +39,7 @@ export default function MyPostsScreen() {
       <FlatList
         data={posts}
         keyExtractor={(item) => item.id}
-        renderItem={({ item }) => <PostCard post={item} />}
+        renderItem={({ item }) => <PostCard post={item} onPress={() => router.push(`/(app)/posts/${item.id}`)}/>}
         contentContainerStyle={{ paddingBottom: 32 }}
         showsVerticalScrollIndicator={false}
         refreshControl={
