@@ -1,15 +1,17 @@
-import { useQuery } from '@tanstack/react-query';
-import { ActivityIndicator, FlatList, RefreshControl, Text, View } from 'react-native';
+// import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { ActivityIndicator, Alert, FlatList, RefreshControl, Text, View } from 'react-native';
 
 import { PostCard } from '@/components/posts/PostCard';
 import { useAuth } from '@/core/auth/AuthProvider';
-import { fetchMyPosts } from '@/core/services/post.service';
+import { deletePost, fetchMyPosts } from '@/core/services/post.service';
 import { router } from 'expo-router';
 
 export default function MyPostsScreen() {
   const { user } = useAuth();
   const authorId = user?.id;
   const name = user?.name ?? 'usuário';
+  const queryClient = useQueryClient();
 
   const { data, isLoading, isRefetching, refetch, isError } = useQuery({
     queryKey: ['posts', 'mine', authorId],
@@ -18,6 +20,30 @@ export default function MyPostsScreen() {
   });
 
   const posts = data?.data ?? [];
+
+  const handleEdit = (id: string) => {
+    router.push(`/(app)/posts/manage/${id}`);
+  };
+
+  const handleDelete = (id: string) => {
+    Alert.alert('Excluir post', 'Deseja realmente excluir este post?', [
+      { text: 'Cancelar', style: 'cancel' },
+      {
+        text: 'Excluir',
+        style: 'destructive',
+        onPress: async () => {
+          try {
+            await deletePost(id);
+            queryClient.invalidateQueries({ queryKey: ['posts', 'mine'] });
+            queryClient.invalidateQueries({ queryKey: ['posts', 'feed'] });
+            refetch();
+          } catch (err) {
+            Alert.alert('Erro', 'Não foi possível excluir o post.');
+          }
+        },
+      },
+    ]);
+  };
 
   if (isLoading) {
     return (
@@ -39,7 +65,15 @@ export default function MyPostsScreen() {
       <FlatList
         data={posts}
         keyExtractor={(item) => item.id}
-        renderItem={({ item }) => <PostCard post={item} onPress={() => router.push(`/(app)/posts/${item.id}`)}/>}
+        renderItem={({ item }) => (
+          <PostCard
+            post={item}
+            mode="management"
+            onPress={() => router.push(`/(app)/posts/${item.id}`)}
+            onEdit={() => handleEdit(item.id)}
+            onDelete={() => handleDelete(item.id)}
+          />
+        )}
         contentContainerStyle={{ paddingBottom: 32 }}
         showsVerticalScrollIndicator={false}
         refreshControl={

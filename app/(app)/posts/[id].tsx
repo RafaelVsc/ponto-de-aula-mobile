@@ -1,14 +1,17 @@
+import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { router, Stack, useLocalSearchParams } from "expo-router";
-import FontAwesome from "@expo/vector-icons/FontAwesome";
 import {
+  ActionSheetIOS,
   ActivityIndicator,
   Alert,
+  type AlertButton,
+  Platform,
   Pressable,
   RefreshControl,
   ScrollView,
   Text,
-  View
+  View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -20,6 +23,7 @@ import Colors from "@/constants/Colors";
 import { useAuth } from "@/core/auth/AuthProvider";
 import { canDelete } from "@/core/auth/rbac";
 import { deletePost, fetchPostById } from "@/core/services/post.service";
+import Feather from "@expo/vector-icons/Feather";
 
 export default function PostDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -44,6 +48,51 @@ export default function PostDetailScreen() {
   );
   const canUpdate = isOwner;
   const canRemove = post ? canDelete(post, user) : false;
+  const showActions = canUpdate || canRemove;
+
+  const openActions = () => {
+    const options: {
+      label: string;
+      onPress: () => void;
+      destructive?: boolean;
+    }[] = [];
+    if (canUpdate)
+      options.push({
+        label: "Editar",
+        onPress: () => router.push(`/(app)/posts/manage/${post.id}`),
+      });
+    if (canRemove)
+      options.push({
+        label: "Excluir",
+        onPress: confirmDelete,
+        destructive: true,
+      });
+    if (!options.length) return;
+
+    if (Platform.OS === "ios") {
+      ActionSheetIOS.showActionSheetWithOptions(
+        {
+          options: [...options.map((o) => o.label), "Cancelar"],
+          cancelButtonIndex: options.length,
+          destructiveButtonIndex: options.findIndex((o) => o.destructive),
+        },
+        (idx) => {
+          if (idx === options.length || idx < 0) return;
+          options[idx]?.onPress();
+        }
+      );
+    } else {
+      const buttons: AlertButton[] = [
+        ...options.map((o): AlertButton => ({
+          text: o.label,
+          onPress: o.onPress,
+          style: o.destructive ? "destructive" : "default",
+        })),
+        { text: "Cancelar", style: "cancel" },
+      ];
+      Alert.alert("Ações", undefined, buttons);
+    }
+  };
 
   if (isLoading)
     return (
@@ -96,22 +145,23 @@ export default function PostDetailScreen() {
         options={{
           title: post.title ?? "Post",
           headerBackTitle: "Voltar",
-          headerBackVisible: true,
-          headerRight: () => (
-            <Pressable
-              onPress={toggleColorScheme}
-              hitSlop={8}
-              style={{ paddingHorizontal: 8, paddingVertical: 4 }}
-            >
-              <FontAwesome
-                name={colorScheme === "dark" ? "sun-o" : "moon-o"}
-                size={20}
-                color={Colors[colorScheme ?? "light"].text}
-              />
-            </Pressable>
-          ),
+          headerRight: () =>
+            showActions ? (
+              <Pressable
+                onPress={openActions}
+                hitSlop={8}
+                style={{ paddingHorizontal: 8, paddingVertical: 4 }}
+              >
+                <Feather
+                  name="more-vertical"
+                  size={22}
+                  color={Colors[colorScheme ?? "light"].text}
+                />
+              </Pressable>
+            ) : null,
         }}
       />
+
       <Pressable
         onPress={() => router.back()}
         hitSlop={8}
@@ -127,9 +177,7 @@ export default function PostDetailScreen() {
           size={16}
           color={Colors[colorScheme ?? "light"].text}
         />
-        <Text className="text-base font-medium text-foreground">
-          Voltar
-        </Text>
+        <Text className="text-base font-medium text-foreground">Voltar</Text>
       </Pressable>
       <PostBody
         post={post}

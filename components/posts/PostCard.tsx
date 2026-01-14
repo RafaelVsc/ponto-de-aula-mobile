@@ -8,9 +8,19 @@ interface PostCardProps {
   post: Post;
   onPress?: () => void;
   className?: string;
+  mode?: 'feed' | 'management';
+  onEdit?: () => void;
+  onDelete?: () => void;
 }
 
-export function PostCard({ post, onPress, className }: PostCardProps) {
+export function PostCard({
+  post,
+  onPress,
+  className,
+  mode = 'feed',
+  onEdit,
+  onDelete,
+}: PostCardProps) {
   // Formatação simples de data (caso não tenha date-fns)
   const formatDate = (dateStr?: string) => {
     if (!dateStr) return '';
@@ -101,10 +111,35 @@ export function PostCard({ post, onPress, className }: PostCardProps) {
 
         {/* 5. Rodapé / Link */}
         <View className="mt-4 flex-row items-center justify-end border-t border-border pt-3">
-          <View className="flex-row items-center">
-            <Text className="mr-1 text-xs font-bold text-primary">Ler conteúdo completo</Text>
-            <Feather name="chevron-right" size={14} color="#1e3a8a" />
-          </View>
+          {mode === 'management' ? (
+            <View className="flex-row items-center gap-4">
+              {onEdit && (
+                <Pressable
+                  onPress={onEdit}
+                  hitSlop={8}
+                  className="flex-row items-center"
+                >
+                  <Feather name="edit-2" size={16} color="#1e3a8a" />
+                  <Text className="ml-1 text-xs font-semibold text-primary">Editar</Text>
+                </Pressable>
+              )}
+              {onDelete && (
+                <Pressable
+                  onPress={onDelete}
+                  hitSlop={8}
+                  className="flex-row items-center"
+                >
+                  <Feather name="trash-2" size={16} color="#dc2626" />
+                  <Text className="ml-1 text-xs font-semibold text-destructive">Excluir</Text>
+                </Pressable>
+              )}
+            </View>
+          ) : (
+            <View className="flex-row items-center">
+              <Text className="mr-1 text-xs font-bold text-primary">Ler conteúdo completo</Text>
+              <Feather name="chevron-right" size={14} color="#1e3a8a" />
+            </View>
+          )}
         </View>
       </View>
     </Pressable>

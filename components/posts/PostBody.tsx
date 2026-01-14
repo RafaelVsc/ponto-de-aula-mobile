@@ -1,4 +1,3 @@
-import { Button } from "@/components/ui/Button";
 import { Post } from "@/core/types";
 import { Image, Text, View } from "react-native";
 import { PostVideo } from "./PostVideo";
@@ -60,7 +59,7 @@ export function PostBody({
 
       <PostVideo videoUrl={post.videoUrl} />
 
-      {(canUpdate || canRemove) && (
+      {/* {(canUpdate || canRemove) && (
         <View className="mt-8 border-t border-border pt-4">
           <Text className="mb-3 text-sm font-semibold text-muted-foreground">
             Ações administrativas
@@ -76,7 +75,7 @@ export function PostBody({
             />
           )}
         </View>
-      )}
+      )} */}
     </View>
   );
 }
