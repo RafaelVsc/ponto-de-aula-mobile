@@ -82,14 +82,14 @@ export type CreatePostPayload = {
   title: string;
   content: string;
   tags?: string[];
-  imageUrl?: string;
-  videoUrl?: string;
+  imageUrl?: string | null;
+  videoUrl?: string | null;
 };
 
 export type UpdatePostPayload = {
   title?: string;
   content?: string;
   tags?: string[];
-  imageUrl?: string;
-  videoUrl?: string;
+  imageUrl?: string | null;
+  videoUrl?: string | null;
 };
