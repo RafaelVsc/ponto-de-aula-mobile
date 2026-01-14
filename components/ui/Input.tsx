@@ -27,6 +27,8 @@ export function Input({
   const [showPassword, setShowPassword] = useState(false);
   const colorScheme = useColorScheme() ?? 'light';
   const palette = Colors[colorScheme];
+  const errorColor = palette?.destructive ?? '#dc2626';
+  const borderColor = error ? errorColor : isFocused ? palette.ring : palette.border;
 
   const secureTextEntry = isPassword && !showPassword;
 
@@ -40,7 +42,7 @@ export function Input({
           className
         )}
         style={{
-          borderColor: error ? palette.destructive : isFocused ? palette.ring : palette.border,
+          borderColor,
           borderWidth: 1,
         }}
       >
@@ -48,7 +50,7 @@ export function Input({
           <Feather
             name={icon}
             size={20}
-            color={error ? palette.destructive : palette.muted}
+            color={error ? errorColor : palette.muted}
             style={{ marginRight: 8 }}
           />
         )}
@@ -75,7 +77,7 @@ export function Input({
         )}
       </View>
 
-      {error && <Text className="mt-1 text-xs text-red-500">{error}</Text>}
+      {error && <Text className="mt-1 text-xs" style={{ color: errorColor }}>{error}</Text>}
     </View>
   );
 }

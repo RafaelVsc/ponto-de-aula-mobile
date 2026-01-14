@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 export const PostSchema = z.object({
-  title: z.string().trim().min(3, "Título é obrigatório"),
+  title: z.string().trim().min(3, "Título deve ter pelo menos 3 caracteres"),
   content: z
     .string()
     .trim()

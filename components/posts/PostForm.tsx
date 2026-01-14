@@ -5,6 +5,9 @@ import { useEffect, useMemo } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { ScrollView, Text, TextInput, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import Toast from "react-native-toast-message";
+import { useColorScheme } from "@/components/useColorScheme";
+import Colors from "@/constants/Colors";
 import { Button } from "../ui/Button";
 import { Input } from "../ui/Input";
 
@@ -26,6 +29,9 @@ export function PostForm({
   onCancel,
 }: PostFormProps) {
   const insets = useSafeAreaInsets();
+  const colorScheme = useColorScheme() ?? "light";
+  const palette = Colors[colorScheme];
+  const errorColor = palette?.destructive ?? "#dc2626";
   const initialValues = useMemo<PostFormValues>(
     () => ({
       title: defaultValues?.title ?? "",
@@ -46,19 +52,52 @@ export function PostForm({
     resolver: zodResolver(PostSchema),
     defaultValues: initialValues,
   });
+  console.log("[PostForm:errors]", errors);
 
   useEffect(() => {
     reset(initialValues);
   }, [initialValues, reset]);
 
-  const submitForm = handleSubmit((values) => {
-    const tags =
-      values.tagsInput
-        ?.split(",")
-        .map((t) => t.trim())
-        .filter(Boolean) ?? [];
-    onSubmit({ ...values, tags });
-  });
+  const submitForm = handleSubmit(
+    (values) => {
+      const tags =
+        values.tagsInput
+          ?.split(",")
+          .map((t) => t.trim())
+          .filter(Boolean) ?? [];
+      onSubmit({ ...values, tags });
+    },
+    (formErrors) => {
+      const firstError =
+        formErrors.title?.message ||
+        formErrors.content?.message ||
+        formErrors.imageUrl?.message ||
+        formErrors.videoUrl?.message;
+      if (firstError) {
+        Toast.show({
+          type: "error",
+          text1: "Dados inválidos",
+          text2: firstError,
+        });
+      }
+    }
+  );
+
+  const handleSafeSubmit = async () => {
+    try {
+      await submitForm();
+    } catch (err: any) {
+      const firstError =
+        err?.issues?.[0]?.message ??
+        err?.errors?.[0]?.message ??
+        "Preencha os campos obrigatórios.";
+      Toast.show({
+        type: "error",
+        text1: "Dados inválidos",
+        text2: firstError,
+      });
+    }
+  };
 
   return (
     <ScrollView
@@ -101,15 +140,21 @@ export function PostForm({
                 multiline
                 textAlignVertical="top"
                 placeholder="Escreva o conteúdo aqui..."
-                className="rounded-lg border border-border bg-card px-3 py-3 text-base leading-5 text-foreground"
+                className="rounded-lg bg-card px-3 py-3 text-base leading-5 text-foreground"
                 scrollEnabled={false}
-                style={{ minHeight: 140, maxHeight: 240 }}
+                style={{
+                  minHeight: 140,
+                  maxHeight: 240,
+                  borderWidth: 1,
+                  borderColor: errors.content ? errorColor : palette.border,
+                }}
                 onChangeText={onChange}
                 onBlur={onBlur}
                 value={value}
+                placeholderTextColor={palette.mutedForeground}
               />
               {errors.content?.message && (
-                <Text className="mt-1 text-xs text-red-500">
+                <Text className="mt-1 text-xs" style={{ color: errorColor }}>
                   {errors.content.message}
                 </Text>
               )}
@@ -168,7 +213,7 @@ export function PostForm({
       <View className="mt-6 flex-row gap-3">
         <Button
           label={mode === "create" ? "Publicar" : "Salvar alterações"}
-          onPress={submitForm}
+          onPress={handleSafeSubmit}
           loading={submitting}
           disabled={submitting}
           className="flex-1"
