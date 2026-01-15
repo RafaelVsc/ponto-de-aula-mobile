@@ -45,6 +45,6 @@ export async function deletePost(id: string): Promise<ApiResponse<{ id: string }
 }
 
 // Buscar autores de post
-export async function fetchAuthors() {
+export async function fetchAuthors(): Promise<ApiResponse<AuthorSummary[]>> {
     return api.post<ApiResponse<AuthorSummary[]>>(`posts/authors`)
 }
