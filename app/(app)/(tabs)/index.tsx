@@ -1,27 +1,35 @@
-import { PostCard } from '@/components/posts/PostCard';
-import { useAuth } from '@/core/auth/AuthProvider';
-import { fetchPosts } from '@/core/services/post.service';
-import type { Post } from '@/core/types';
-import { useQuery } from '@tanstack/react-query';
-import { router } from 'expo-router';
-import { ActivityIndicator, FlatList, RefreshControl, Text, View } from 'react-native';
+import { PostCard } from "@/components/posts/PostCard";
+import { useAuth } from "@/core/auth/AuthProvider";
+import { fetchPosts } from "@/core/services/post.service";
+import type { Post } from "@/core/types";
+import { useInfiniteQuery } from "@tanstack/react-query";
+import { router } from "expo-router";
+import { useState } from "react";
+import {
+  ActivityIndicator,
+  FlatList,
+  RefreshControl,
+  Text,
+  View,
+} from "react-native";
 
 export default function FeedScreen() {
   const { user } = useAuth();
-  const name = user?.name ?? 'Usuário';
+  const name = user?.name ?? "Usuário";
+  const [search, setSearch] = useState("");
+  const limit = 10;
 
-  const {
-    data,
-    isLoading,
-    isRefetching,
-    refetch,
-    isError,
-  } = useQuery({
-    queryKey: ['posts', 'feed'],
-    queryFn: () => fetchPosts(),
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading, isRefetching, refetch, isError } = useInfiniteQuery({
+    queryKey:["posts", "feed", { search }],
+    initialPageParam: 1,
+    queryFn: ({ pageParam = 1 }) =>
+      fetchPosts({ search: search || undefined, page: pageParam, limit }),
+    getNextPageParam: (last) =>
+      last?.meta?.hasNextPage ? (last.meta?.page ?? 1) + 1 : undefined,
   });
 
-  const posts: Post[] = data?.data ?? [];
+  
+  const posts: Post[] = data?.pages?.flatMap((p) => p.data) ?? [];
 
   if (isLoading) {
     return (
@@ -40,16 +48,34 @@ export default function FeedScreen() {
       <FlatList
         data={posts}
         keyExtractor={(item) => item.id}
-        renderItem={({ item }) => <PostCard post={item} onPress={() => router.push(`/(app)/posts/${item.id}`)}/>}
+        renderItem={({ item }) => (
+          <PostCard
+            post={item}
+            onPress={() => router.push(`/(app)/posts/${item.id}`)}
+          />
+        )}
         contentContainerStyle={{ paddingBottom: 32 }}
         showsVerticalScrollIndicator={false}
         refreshControl={
           <RefreshControl refreshing={isRefetching} onRefresh={refetch} />
         }
+        onEndReachedThreshold={0.5}
+        onEndReached={() => {
+          if (hasNextPage && !isFetchingNextPage) fetchNextPage();
+        }}
+        ListFooterComponent={
+          isFetchingNextPage ? (
+            <View className="py-4">
+              <ActivityIndicator />
+            </View>
+          ) : null
+        }
         ListEmptyComponent={
           <View className="mt-8 items-center">
             <Text className="text-sm text-muted-foreground dark:text-muted-foreground-dark">
-              {isError ? 'Não foi possível carregar os posts.' : 'Nenhum post encontrado.'}
+              {isError
+                ? "Não foi possível carregar os posts."
+                : "Nenhum post encontrado."}
             </Text>
           </View>
         }

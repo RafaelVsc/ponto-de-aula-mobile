@@ -1,7 +1,9 @@
 import { api } from '../api/client';
 import type {
   ApiResponse,
+  AuthorSummary,
   CreatePostPayload,
+  PaginatedResponse,
   Post,
   PostSearchParams,
   UpdatePostPayload
@@ -10,12 +12,13 @@ import type {
 const BASE_URL = '/posts';
 
 // Lista de posts (com filtros/paginação)
-export async function fetchPosts(params?: PostSearchParams): Promise<ApiResponse<Post[]>> {
-  return api.get<ApiResponse<Post[]>>(BASE_URL, { params });
+export async function fetchPosts(params?: PostSearchParams): Promise<PaginatedResponse<Post[]>> {
+  console.log('[fetchPosts]', params)
+  return api.get<PaginatedResponse<Post[]>>(`${BASE_URL}/search`, { params });
 }
 
-export async function fetchMyPosts(): Promise<ApiResponse<Post[]>> {
-  return api.get<ApiResponse<Post[]>>(`/posts/mine`);
+export async function fetchMyPosts(): Promise<PaginatedResponse<Post[]>> {
+  return api.get<PaginatedResponse<Post[]>>(`/posts/mine`);
 }
 
 // // Detalhe de post
@@ -39,4 +42,9 @@ export async function updatePost(
 // Remover post
 export async function deletePost(id: string): Promise<ApiResponse<{ id: string }>> {
   return api.delete<ApiResponse<{ id: string }>>(`${BASE_URL}/${id}`);
+}
+
+// Buscar autores de post
+export async function fetchAuthors() {
+    return api.post<ApiResponse<AuthorSummary[]>>(`posts/authors`)
 }

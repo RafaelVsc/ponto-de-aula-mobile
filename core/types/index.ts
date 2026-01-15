@@ -47,6 +47,28 @@ export type Session = {
   token: string;
 };
 
+export type PaginatedMeta = {
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
+  hasNextPage: boolean;
+  hasPreviousPage: boolean;
+};
+
+export type PaginatedResponse<T> = {
+  status?: string;
+  message?: string;
+  data: T;
+  meta: PaginatedMeta;
+};
+
+export type AuthorSummary = {
+  id: string;
+  name: string;
+  totalPosts: number;
+}
+
 export interface Post {
   id: string;
   title: string;
