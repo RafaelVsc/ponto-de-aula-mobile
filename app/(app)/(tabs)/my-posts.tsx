@@ -1,9 +1,10 @@
 // import { useQuery } from '@tanstack/react-query';
 import { PostCard } from "@/components/posts/PostCard";
-import { Button } from "@/components/ui/Button";
+import { Fab } from "@/components/ui/Fab";
 import { useAuth } from "@/core/auth/AuthProvider";
 import { can } from "@/core/auth/rbac";
 import { deletePost, fetchMyPosts } from "@/core/services/post.service";
+import { Feather } from "@expo/vector-icons";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { router } from "expo-router";
 import {
@@ -64,22 +65,10 @@ export default function MyPostsScreen() {
   }
 
   return (
-    <View className="flex-1 bg-background dark:bg-background-dark px-4 py-6">
-      <Text className="mb-4 text-2xl font-bold text-foreground dark:text-foreground-dark">
-        Meus posts
-      </Text>
+    <View className="flex-1 bg-background dark:bg-background-dark px-4 py-6 relative">
       <Text className="mb-6 text-sm text-muted-foreground dark:text-muted-foreground-dark">
         {`Olá, ${name}. Aqui estão os posts que você publicou.`}
       </Text>
-      <View>
-        {canCreate && (
-          <Button
-            label="Novo post"
-            className="mb-4"
-            onPress={() => router.push("/(app)/posts/manage/new")}
-          />
-        )}
-      </View>
 
       <FlatList
         data={posts}
@@ -108,6 +97,14 @@ export default function MyPostsScreen() {
           </View>
         }
       />
+
+      {canCreate && (
+        <Fab
+          onPress={() => router.push("/(app)/posts/manage/new")}
+          accessibilityLabel="Criar novo post"
+          icon={<Feather name="plus" size={24} color="#fff" />}
+        />
+      )}
     </View>
   );
 }

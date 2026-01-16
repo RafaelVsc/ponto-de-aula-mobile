@@ -8,7 +8,7 @@ import {
 import { can } from "@/core/auth/rbac";
 import { useAuth } from "@/core/auth/AuthProvider";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { router, useLocalSearchParams } from "expo-router";
+import { router, useLocalSearchParams, useNavigation } from "expo-router";
 import {
     ActivityIndicator,
     KeyboardAvoidingView,
@@ -18,6 +18,7 @@ import {
 
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Toast from "react-native-toast-message";
+import { useEffect } from "react";
 
 export default function ManagePostScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -25,8 +26,14 @@ export default function ManagePostScreen() {
   const queryClient = useQueryClient();
   const insets = useSafeAreaInsets();
   const { user } = useAuth();
+  const navigation = useNavigation();
 
   const canCreate = can(user, "create", "Post");
+  useEffect(() => {
+    navigation.setOptions({
+      title: isCreate ? "Novo post" : "Editar post",
+    });
+  }, [navigation, isCreate]);
 
   const { data, isLoading, isError } = useQuery({
     queryKey: ["post", id],

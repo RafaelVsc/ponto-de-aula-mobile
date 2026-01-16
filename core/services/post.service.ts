@@ -13,7 +13,6 @@ const BASE_URL = '/posts';
 
 // Lista de posts (com filtros/paginação)
 export async function fetchPosts(params?: PostSearchParams): Promise<PaginatedResponse<Post[]>> {
-  console.log('[fetchPosts]', params)
   return api.get<PaginatedResponse<Post[]>>(`${BASE_URL}/search`, { params });
 }
 
@@ -46,5 +45,5 @@ export async function deletePost(id: string): Promise<ApiResponse<{ id: string }
 
 // Buscar autores de post
 export async function fetchAuthors(): Promise<ApiResponse<AuthorSummary[]>> {
-    return api.post<ApiResponse<AuthorSummary[]>>(`posts/authors`)
+  return api.get<ApiResponse<AuthorSummary[]>>(`${BASE_URL}/authors`);
 }

@@ -106,10 +106,6 @@ export function PostForm({
       keyboardShouldPersistTaps="handled"
       keyboardDismissMode="on-drag"
     >
-      <Text className="mb-4 text-2xl font-bold text-foreground">
-        {mode === "create" ? "Novo post" : "Editar post"}
-      </Text>
-
       <View className="gap-4">
         {/* Título */}
         <Controller

@@ -8,9 +8,6 @@ export default function MyProfileScreen() {
 
   return (
     <View className="flex-1 bg-background dark:bg-background-dark px-4 py-6">
-      <Text className="mb-2 text-2xl font-bold text-foreground dark:text-foreground-dark">
-        Meus dados
-      </Text>
       <Text className="text-sm text-muted-foreground dark:text-muted-foreground-dark">
         Nome: {name}
       </Text>
