@@ -7,6 +7,7 @@ import { useAuth } from "@/core/auth/AuthProvider";
 import { can } from "@/core/auth/rbac";
 import { fetchAuthors, fetchPosts } from "@/core/services/post.service";
 import type { Post } from "@/core/types";
+import { Feather } from "@expo/vector-icons";
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { router } from "expo-router";
 import { useEffect, useState } from "react";
@@ -159,7 +160,7 @@ export default function FeedScreen() {
         <Fab
           onPress={() => router.push("/(app)/posts/manage/new")}
           accessibilityLabel="Criar novo post"
-          icon={<Text className="text-white text-xl font-bold">+</Text>}
+          icon={<Feather name="plus" size={24} color="#fff" />}
         />
       )}
     </View>
