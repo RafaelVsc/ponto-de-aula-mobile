@@ -16,7 +16,7 @@ import {
   FlatList,
   RefreshControl,
   Text,
-  View
+  View,
 } from "react-native";
 
 export default function FeedScreen() {
@@ -40,7 +40,7 @@ export default function FeedScreen() {
     queryFn: fetchAuthors,
   });
   const authors = authorsQuery.data?.data ?? [];
-  console.log('[authors]', authors.length);
+  console.log("[authors]", authors.length);
   const {
     data,
     fetchNextPage,
@@ -51,7 +51,11 @@ export default function FeedScreen() {
     refetch,
     isError,
   } = useInfiniteQuery({
-    queryKey: ["posts", "feed", { search: debouncedSearch, authorId, sortOrder }],
+    queryKey: [
+      "posts",
+      "feed",
+      { search: debouncedSearch, authorId, sortOrder },
+    ],
     initialPageParam: 1,
     queryFn: ({ pageParam = 1 }) =>
       fetchPosts({
