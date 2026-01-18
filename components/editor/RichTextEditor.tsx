@@ -13,7 +13,7 @@ const editorSource = require("@/assets/editor.html");
 export function RichTextEditor({ initialHtml, onChange, style }: Props) {
   const webviewRef = useRef<WebView>(null);
   const [ready, setReady] = useState(false);
-  const lastSentHtml = useRef<string | undefined>();
+  const lastSentHtml = useRef<string | undefined>(undefined);
 
   const handleMessage = (event: WebViewMessageEvent) => {
     try {

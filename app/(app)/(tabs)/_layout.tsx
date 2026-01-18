@@ -1,5 +1,5 @@
 import FontAwesome from "@expo/vector-icons/FontAwesome";
-import { Link, Tabs, useRouter } from "expo-router";
+import { Tabs, useRouter } from "expo-router";
 import React from "react";
 import { Pressable, View } from "react-native";
 
@@ -32,6 +32,8 @@ export default function TabLayout() {
   const canSeeMyPosts = ["ADMIN", "AUTHOR", "TEACHER", "SECRETARY"].includes(
     user?.role ?? ""
   );
+  // Roles com permissão para a aba restrita (ex.: Users)
+  const canSeeUsers = ["ADMIN", "SECRETARY"].includes(user?.role ?? "");
 
   const handleLogout = async () => {
     await logout();
@@ -94,6 +96,16 @@ export default function TabLayout() {
           // Esconde a aba para quem não tem permissão
           href: canSeeMyPosts ? undefined : null,
         }}
+      />
+      <Tabs.Screen
+      name="users"
+      options={{
+        title: "Usuários",
+        tabBarIcon: ({color}) => (
+          <TabBarIcon name="users" color={color} />
+        ),
+        href: canSeeUsers ? undefined : null,
+      }}
       />
       <Tabs.Screen
         name="my-profile"
