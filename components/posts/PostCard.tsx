@@ -3,6 +3,7 @@ import { cn } from '@/lib/utils';
 import { Feather } from '@expo/vector-icons';
 import React from 'react';
 import { Image, Pressable, Text, View } from 'react-native';
+const placeholder = require('@/assets/images/bg-ponto-de-aula.webp');
 
 interface PostCardProps {
   post: Post;
@@ -37,19 +38,12 @@ export function PostCard({
       )}
     >
       {/* 1. Imagem de Capa (Placeholder se não houver) */}
-      <View className="h-40 w-full bg-slate-100 items-center justify-center">
-        {post.imageUrl ? (
-          <Image
-            source={{ uri: post.imageUrl }}
-            className="h-full w-full"
-            resizeMode="cover"
-          />
-        ) : (
-          <View className="items-center justify-center">
-            <Feather name="image" size={32} color="#9ca3af" />
-            <Text className="text-xs text-slate-400 mt-2">Sem imagem de capa</Text>
-          </View>
-        )}
+      <View className="h-40 w-full bg-slate-100 items-center justify-center overflow-hidden">
+        <Image
+          source={post.imageUrl ? { uri: post.imageUrl } : placeholder}
+          className="h-full w-full"
+          resizeMode="cover"
+        />
         {/* SE tiver vídeo, mostra o selo no topo direito */}
         {post.videoUrl && (
             <View className="absolute top-2 right-2 flex-row items-center gap-1 

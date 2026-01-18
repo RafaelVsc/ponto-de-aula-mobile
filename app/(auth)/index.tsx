@@ -4,7 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
-import { ActivityIndicator, Text, View } from 'react-native';
+import { ActivityIndicator, ImageBackground, Text, View } from 'react-native';
 import 'react-native-reanimated';
 import Toast from 'react-native-toast-message';
 import { ZodError } from 'zod';
@@ -14,6 +14,8 @@ import { Input } from '@/components/ui/Input';
 import { useAuth } from '@/core/auth/AuthProvider';
 import { login } from '@/core/services/auth.service';
 import { LoginSchema, type LoginFormValues } from '@/core/validation/auth';
+
+const bgLogin = require('@/assets/images/bg-ponto-de-aula.webp');
 
 export default function LoginScreen() {
   const router = useRouter();
@@ -98,92 +100,96 @@ export default function LoginScreen() {
 
   if (authLoading) {
     return (
-      <View className="flex-1 items-center justify-center bg-background">
-        <ActivityIndicator size="large" />
-      </View>
+      <ImageBackground source={bgLogin} style={{ flex: 1 }} resizeMode="cover">
+        <View className="flex-1 items-center justify-center bg-black/40">
+          <ActivityIndicator size="large" />
+        </View>
+      </ImageBackground>
     );
   }
 
   return (
-    <View className="flex-1 justify-center bg-background px-6 py-12">
-      <View className="items-center mb-8">
-        <View className="mb-4 h-16 w-16 items-center justify-center rounded-lg bg-primary shadow-sm">
-          <Feather name="book-open" size={32} color="#f9fafb" />
-        </View>
-        <Text className="text-2xl font-bold text-foreground">Ponto de Aula</Text>
-        <Text className="text-muted-foreground mt-2">Faça login para continuar</Text>
-      </View>
-
-      <View className="rounded-lg border border-border bg-card p-6 shadow-sm">
-        <Controller
-          control={control}
-          name="identifier"
-          render={({ field: { onChange, onBlur, value } }) => (
-            <Input
-              label="E-mail ou usuário"
-              placeholder="ex: voce@escola.com"
-              icon="mail"
-              onBlur={onBlur}
-              onChangeText={onChange}
-              value={value}
-              error={errors.identifier?.message}
-              autoCapitalize="none"
-              autoCorrect={false}
-              keyboardType="email-address"
-            />
-          )}
-        />
-
-        <View className="h-4" />
-
-        <Controller
-          control={control}
-          name="password"
-          render={({ field: { onChange, onBlur, value } }) => (
-            <Input
-              label="Senha"
-              placeholder="••••••••"
-              isPassword
-              icon="lock"
-              onBlur={onBlur}
-              onChangeText={onChange}
-              value={value}
-              error={errors.password?.message}
-            />
-          )}
-        />
-
-        <View className="h-6" />
-
-        <Button
-          label="Entrar"
-          onPress={triggerSubmit}
-          loading={submitting}
-          disabled={submitting}
-        />
-      </View>
-
-      {__DEV__ && (
-        <View className="mt-8 border-t border-border pt-6">
-          <Text className="mb-3 text-center text-xs font-bold uppercase tracking-wider text-muted-foreground">
-            Acesso rápido (DEV)
-          </Text>
-          <View className="flex-row justify-center gap-3">
-            <Button
-              size="sm"
-              variant="secondary"
-              label="Admin"
-              onPress={() => fillDevCredentials('admin')}
-            />
-            <Button
-              size="sm"
-              variant="secondary"
-              label="Aluno"
-              onPress={() => fillDevCredentials('student')}
-            />
+    <ImageBackground source={bgLogin} style={{ flex: 1 }} resizeMode="cover">
+      <View className="flex-1 justify-center px-6 py-12">
+        <View className="rounded-2xl bg-card/90 p-6 shadow-sm bg-background">
+          <View className="items-center mb-8">
+            <View className="mb-4 h-16 w-16 items-center justify-center rounded-lg bg-primary shadow-sm">
+              <Feather name="book-open" size={32} color="#f9fafb" />
+            </View>
+            <Text className="text-2xl font-bold text-foreground">Ponto de Aula</Text>
+            <Text className="text-muted-foreground mt-2">Use o email institucional ou username</Text>
           </View>
+
+          <Controller
+            control={control}
+            name="identifier"
+            render={({ field: { onChange, onBlur, value } }) => (
+              <Input
+                label="E-mail ou usuário"
+                placeholder="ex: voce@pontodeaula.com.br"
+                icon="mail"
+                onBlur={onBlur}
+                onChangeText={onChange}
+                value={value}
+                error={errors.identifier?.message}
+                autoCapitalize="none"
+                autoCorrect={false}
+                keyboardType="email-address"
+              />
+            )}
+          />
+
+          <View className="h-4" />
+
+          <Controller
+            control={control}
+            name="password"
+            render={({ field: { onChange, onBlur, value } }) => (
+              <Input
+                label="Senha"
+                placeholder="••••••••"
+                isPassword
+                icon="lock"
+                onBlur={onBlur}
+                onChangeText={onChange}
+                value={value}
+                error={errors.password?.message}
+              />
+            )}
+          />
+
+          <View className="h-6" />
+
+          <Button
+            label="Entrar"
+            onPress={triggerSubmit}
+            loading={submitting}
+            disabled={submitting}
+          />
+
+          {__DEV__ && (
+            <View className="mt-8 border-t border-border pt-6">
+              <Text className="mb-3 text-center text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                Acesso rápido (DEV)
+              </Text>
+              <View className="flex-row justify-center gap-3">
+                <Button
+                  size="sm"
+                  variant="secondary"
+                  label="Admin"
+                  onPress={() => fillDevCredentials('admin')}
+                />
+                <Button
+                  size="sm"
+                  variant="secondary"
+                  label="Aluno"
+                  onPress={() => fillDevCredentials('student')}
+                />
+              </View>
+            </View>
+          )}
         </View>
-      )}
-    </View>
+      </View>
+    </ImageBackground>
   );
 }

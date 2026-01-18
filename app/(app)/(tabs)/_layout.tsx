@@ -54,18 +54,6 @@ export default function TabLayout() {
           />
         )}
       </Pressable>
-      <Link href="/(app)/modal" asChild>
-        <Pressable hitSlop={8} style={{ marginRight: 12 }}>
-          {({ pressed }) => (
-            <FontAwesome
-              name="info-circle"
-              size={25}
-              color={Colors[colorScheme ?? "light"].text}
-              style={{ opacity: pressed ? 0.5 : 1 }}
-            />
-          )}
-        </Pressable>
-      </Link>
       <Pressable onPress={handleLogout} hitSlop={8}>
         {({ pressed }) => (
           <FontAwesome

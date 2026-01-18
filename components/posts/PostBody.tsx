@@ -1,5 +1,3 @@
-import { useColorScheme } from "@/components/useColorScheme";
-import Colors from "@/constants/Colors";
 import { Post } from "@/core/types";
 import { View } from "react-native";
 import { PostContent } from "./PostContent";
@@ -24,23 +22,24 @@ export function PostBody({
   plainContent,
   formattedDate,
 }: Props) {
-  const colorScheme = useColorScheme() ?? "light";
-  const palette = Colors[colorScheme];
   const contentHtml = htmlContent ?? post.content ?? "";
 
   return (
     <View>
+      {/* Imagem de capa no topo */}
+      <PostMedia imageUrl={post.imageUrl} showVideo={false} />
+
       <PostHeader
         title={post.title}
         author={post.author}
         formattedDate={formattedDate}
       />
-      <PostMedia imageUrl={post.imageUrl} />
       <PostMeta tags={post.tags} />
 
-
       <PostContent html={contentHtml} plainText={plainContent} />
-      <PostMedia videoUrl={post.videoUrl} />
+
+      {/* Vídeo ao final */}
+      <PostMedia videoUrl={post.videoUrl} showImage={false} />
     </View>
   );
 }
