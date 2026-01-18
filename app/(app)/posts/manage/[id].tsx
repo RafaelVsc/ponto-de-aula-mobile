@@ -1,24 +1,24 @@
 // app/(app)/posts/manage/[id].tsx
 import { PostForm } from "@/components/posts/PostForm";
-import {
-    createPost,
-    fetchPostById,
-    updatePost,
-} from "@/core/services/post.service";
-import { can } from "@/core/auth/rbac";
 import { useAuth } from "@/core/auth/AuthProvider";
+import { can } from "@/core/auth/rbac";
+import {
+  createPost,
+  fetchPostById,
+  updatePost,
+} from "@/core/services/post.service";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { router, useLocalSearchParams, useNavigation } from "expo-router";
 import {
-    ActivityIndicator,
-    KeyboardAvoidingView,
-    Text,
-    View
+  ActivityIndicator,
+  KeyboardAvoidingView,
+  Text,
+  View,
 } from "react-native";
 
+import { useEffect } from "react";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Toast from "react-native-toast-message";
-import { useEffect } from "react";
 
 export default function ManagePostScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -75,6 +75,11 @@ export default function ManagePostScreen() {
       queryClient.invalidateQueries({ queryKey: ["posts", "mine"] });
       if (!isCreate) queryClient.invalidateQueries({ queryKey: ["post", id] });
       router.replace(`/(app)/posts/${isCreate ? res.data.id : id}`);
+      Toast.show({
+        type: "success",
+        text1: isCreate ? "Post criado" : "Post atualizado",
+        text2: isCreate ? "Seu post foi publicado." : "Alterações salvas.",
+      });
     },
   });
 

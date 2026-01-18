@@ -15,6 +15,7 @@ import {
   Text,
   View,
 } from "react-native";
+import Toast from "react-native-toast-message";
 
 export default function MyPostsScreen() {
   const { user } = useAuth();
@@ -48,6 +49,10 @@ export default function MyPostsScreen() {
             queryClient.invalidateQueries({ queryKey: ["posts", "mine"] });
             queryClient.invalidateQueries({ queryKey: ["posts", "feed"] });
             refetch();
+            Toast.show({
+              type: "success",
+              text1: "Post excluído",
+            });
           } catch (err) {
             Alert.alert("Erro", "Não foi possível excluir o post.");
           }

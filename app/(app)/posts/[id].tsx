@@ -24,6 +24,7 @@ import { useAuth } from "@/core/auth/AuthProvider";
 import { canDelete } from "@/core/auth/rbac";
 import { deletePost, fetchPostById } from "@/core/services/post.service";
 import Feather from "@expo/vector-icons/Feather";
+import Toast from "react-native-toast-message";
 
 export default function PostDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -78,6 +79,7 @@ export default function PostDetailScreen() {
             queryClient.invalidateQueries({ queryKey: ["posts"] });
             queryClient.invalidateQueries({ queryKey: ["posts", "feed"] });
             queryClient.invalidateQueries({ queryKey: ["posts", "mine"] });
+            Toast.show({ type: "success", text1: "Post excluído" });
             router.back();
           } catch (err) {
             Alert.alert("Erro", "Não foi possível excluir o post.");

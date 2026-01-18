@@ -1,3 +1,5 @@
+import { useColorScheme } from "@/components/useColorScheme";
+import Colors from "@/constants/Colors";
 import { Post } from "@/core/types";
 import { PostFormValues, PostSchema } from "@/core/validation/post";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -6,10 +8,9 @@ import { Controller, useForm } from "react-hook-form";
 import { ScrollView, Text, TextInput, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Toast from "react-native-toast-message";
-import { useColorScheme } from "@/components/useColorScheme";
-import Colors from "@/constants/Colors";
 import { Button } from "../ui/Button";
 import { Input } from "../ui/Input";
+import { RichTextEditor } from "../editor/RichTextEditor";
 
 type PostFormMode = "create" | "edit";
 
@@ -122,32 +123,18 @@ export function PostForm({
             />
           )}
         />
-
-        {/* Conteudo */}
         <Controller
           control={control}
           name="content"
-          render={({ field: { onChange, onBlur, value } }) => (
+          render={({ field: { value, onChange } }) => (
             <View>
               <Text className="mb-1.5 text-sm font-medium text-foreground">
                 Conteúdo
               </Text>
-              <TextInput
-                multiline
-                textAlignVertical="top"
-                placeholder="Escreva o conteúdo aqui..."
-                className="rounded-lg bg-card px-3 py-3 text-base leading-5 text-foreground"
-                scrollEnabled={false}
-                style={{
-                  minHeight: 140,
-                  maxHeight: 240,
-                  borderWidth: 1,
-                  borderColor: errors.content ? errorColor : palette.border,
-                }}
-                onChangeText={onChange}
-                onBlur={onBlur}
-                value={value}
-                placeholderTextColor={palette.mutedForeground}
+              <RichTextEditor
+                initialHtml={value}
+                onChange={onChange}
+                style={{ minHeight: 280 }}
               />
               {errors.content?.message && (
                 <Text className="mt-1 text-xs" style={{ color: errorColor }}>
