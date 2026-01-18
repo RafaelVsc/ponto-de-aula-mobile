@@ -8,22 +8,20 @@ import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
-import 'react-native-reanimated';
+import { ActivityIndicator, View } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import 'react-native-reanimated';
 import '../global.css';
 
 import { ThemeProvider as AppThemeProvider } from '@/components/ThemeProvider';
 import { useColorScheme } from '@/components/useColorScheme';
+import { AppProviders } from '@/core/providers/AppProviders';
+import { useAuth } from '@/core/auth/AuthProvider';
 
 export {
   // Catch any errors thrown by the Layout component.
   ErrorBoundary,
 } from 'expo-router';
-
-export const unstable_settings = {
-  // Ensure that reloading on `/modal` keeps a back button present.
-  initialRouteName: '(tabs)',
-};
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
@@ -52,7 +50,9 @@ export default function RootLayout() {
   return (
     <AppThemeProvider>
       <SafeAreaProvider>
-        <RootLayoutNav />
+        <AppProviders>
+          <RootLayoutNav />
+        </AppProviders>
       </SafeAreaProvider>
     </AppThemeProvider>
   );
@@ -60,13 +60,25 @@ export default function RootLayout() {
 
 function RootLayoutNav() {
   const colorScheme = useColorScheme();
+  const { isAuthenticated, loading } = useAuth();
+
+  if (loading) {
+    return (
+      <ActivityIndicator
+        style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}
+        size="large"
+      />
+    );
+  }
 
   return (
-    <NavigationThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
-      </Stack>
-    </NavigationThemeProvider>
+    <View className={colorScheme === 'dark' ? 'dark flex-1' : 'flex-1'}>
+      <NavigationThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+        <Stack>
+          <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+          <Stack.Screen name="(app)" options={{ headerShown: false }} />
+        </Stack>
+      </NavigationThemeProvider>
+    </View>
   );
 }
