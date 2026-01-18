@@ -88,7 +88,7 @@ export default function TabLayout() {
             <TabBarIcon name="file-text" color={color} />
           ),
           // Esconde a aba para quem não tem permissão
-          href: can("read", "Post") ? undefined : null,
+          href: can("create", "Post") ? undefined : null,
         }}
       />
       <Tabs.Screen
