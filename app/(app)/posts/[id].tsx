@@ -39,16 +39,53 @@ export default function PostDetailScreen() {
   });
 
   const post = data?.data;
-  const plainContent = post?.content?.replace(/<[^>]*>/g, "") ?? "";
-  const formattedDate = post?.createdAt
+
+  if (isLoading)
+    return (
+      <View className="flex-1 items-center justify-center bg-background">
+        <ActivityIndicator />
+      </View>
+    );
+  if (isError || !post) {
+    return (
+      <View className="flex-1 items-center justify-center bg-background px-6">
+        <Text className="mb-4 text-foreground text-center">
+          Não foi possível carregar o post.
+        </Text>
+        <Button label="Tentar novamente" onPress={() => refetch()} />
+      </View>
+    );
+  }
+
+  const plainContent = post.content?.replace(/<[^>]*>/g, "") ?? "";
+  const formattedDate = post.createdAt
     ? new Intl.DateTimeFormat("pt-BR").format(new Date(post.createdAt))
     : null;
-  const isOwner = Boolean(
-    user?.id && post?.authorId && user.id === post.authorId
-  );
+  const isOwner = Boolean(user?.id && post.authorId && user.id === post.authorId);
   const canUpdate = isOwner;
-  const canRemove = post ? canDelete(post, user) : false;
+  const canRemove = canDelete(post, user);
   const showActions = canUpdate || canRemove;
+
+  const confirmDelete = () => {
+    Alert.alert("Excluir post", "Deseja realmente excluir este post?", [
+      { text: "Cancelar", style: "cancel" },
+      {
+        text: "Excluir",
+        style: "destructive",
+        onPress: async () => {
+          try {
+            await deletePost(post.id);
+            queryClient.invalidateQueries({ queryKey: ["posts"] });
+            queryClient.invalidateQueries({ queryKey: ["posts", "feed"] });
+            queryClient.invalidateQueries({ queryKey: ["posts", "mine"] });
+            router.back();
+          } catch (err) {
+            Alert.alert("Erro", "Não foi possível excluir o post.");
+          }
+        },
+      },
+    ]);
+  };
 
   const openActions = () => {
     const options: {
@@ -92,45 +129,6 @@ export default function PostDetailScreen() {
       ];
       Alert.alert("Ações", undefined, buttons);
     }
-  };
-
-  if (isLoading)
-    return (
-      <View className="flex-1 items-center justify-center bg-background">
-        <ActivityIndicator />
-      </View>
-    );
-  if (isError || !post) {
-    return (
-      <View className="flex-1 items-center justify-center bg-background px-6">
-        <Text className="mb-4 text-foreground text-center">
-          Não foi possível carregar o post.
-        </Text>
-        <Button label="Tentar novamente" onPress={() => refetch()} />
-      </View>
-    );
-  }
-
-  const confirmDelete = () => {
-    if (!post.id) return;
-    Alert.alert("Excluir post", "Deseja realmente excluir este post?", [
-      { text: "Cancelar", style: "cancel" },
-      {
-        text: "Excluir",
-        style: "destructive",
-        onPress: async () => {
-          try {
-            await deletePost(post.id);
-            queryClient.invalidateQueries({ queryKey: ["posts"] });
-            queryClient.invalidateQueries({ queryKey: ["posts", "feed"] });
-            queryClient.invalidateQueries({ queryKey: ["posts", "mine"] });
-            router.back();
-          } catch (err) {
-            Alert.alert("Erro", "Não foi possível excluir o post.");
-          }
-        },
-      },
-    ]);
   };
 
   return (
@@ -181,6 +179,7 @@ export default function PostDetailScreen() {
       </Pressable>
       <PostBody
         post={post}
+        htmlContent={post.content}
         plainContent={plainContent}
         formattedDate={formattedDate}
         canUpdate={canUpdate}
