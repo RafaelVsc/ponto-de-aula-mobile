@@ -1,19 +1,19 @@
 import { api } from "../api/client";
 
 import type {
-    ApiResponse,
-    ChangePasswordPayload,
-    CreateUserPayload,
-    UpdateUserPayload,
-    User,
+  ApiResponse,
+  ChangePasswordPayload,
+  CreateUserPayload,
+  UpdateUserPayload,
+  User,
 } from "../types/index";
 
 // qualquer usuário autenticado
-export function getMe(): Promise<ApiResponse<User>> {
+export function fetchMyData(): Promise<ApiResponse<User>> {
   return api.get<ApiResponse<User>>("/users/me");
 }
 
-export function updateMe(
+export function updateMyData(
   payload: UpdateUserPayload,
 ): Promise<ApiResponse<User>> {
   return api.patch<ApiResponse<User>>("/users/me", payload);
