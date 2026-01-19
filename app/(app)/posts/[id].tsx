@@ -185,10 +185,6 @@ export default function PostDetailScreen() {
         htmlContent={post.content}
         plainContent={plainContent}
         formattedDate={formattedDate}
-        canUpdate={canEdit}
-        canRemove={canDeleteAction}
-        onEdit={() => router.push(`/(app)/posts/manage/${post.id}`)}
-        onDelete={confirmDelete}
       />
     </ScrollView>
   );
