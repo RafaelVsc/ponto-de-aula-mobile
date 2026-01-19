@@ -53,7 +53,6 @@ export function PostForm({
     resolver: zodResolver(PostSchema),
     defaultValues: initialValues,
   });
-  console.log("[PostForm:errors]", errors);
 
   useEffect(() => {
     reset(initialValues);

@@ -2,7 +2,8 @@
 <html>
 <head>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" href="https://cdn.quilljs.com/1.3.7/quill.snow.css">
+  <!-- Este arquivo é mantido como referência, mas o app usa uma versão inline que injeta os assets locais via expo-asset -->
+  <link rel="stylesheet" href="./editor/quill.snow.cssasset">
   <style>
     body { margin: 0; padding: 12px; font-family: -apple-system, 'Segoe UI', sans-serif; background: #fff; }
     #toolbar { border: 1px solid #e5e7eb; border-radius: 8px 8px 0 0; }
@@ -18,7 +19,7 @@
     <button class="ql-link"></button>
   </div>
   <div id="editor"></div>
-  <script src="https://cdn.quilljs.com/1.3.7/quill.min.js"></script>
+  <script src="./editor/quill.min.jsbundle"></script>
   <script>
     const RN = window.ReactNativeWebView;
     const quill = new Quill('#editor', {

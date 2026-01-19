@@ -16,8 +16,11 @@
     "ios": {
       "supportsTablet": true,
       "infoPlist": {
-        "NSAppTransportSecurity": { "NSAllowsArbitraryLoads": true }
-      }
+        "NSAppTransportSecurity": {
+          "NSAllowsArbitraryLoads": true
+        }
+      },
+      "bundleIdentifier": "com.anonymous.pontodeaulamobile"
     },
     "android": {
       "adaptiveIcon": {
