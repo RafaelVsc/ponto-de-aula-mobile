@@ -2,11 +2,11 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { router, useLocalSearchParams, useNavigation } from "expo-router";
 import { useEffect, useMemo } from "react";
 import {
-    ActivityIndicator,
-    KeyboardAvoidingView,
-    Platform,
-    Text,
-    View,
+  ActivityIndicator,
+  KeyboardAvoidingView,
+  Platform,
+  Text,
+  View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Toast from "react-native-toast-message";
@@ -15,13 +15,13 @@ import { UserForm } from "@/components/users/UserForm";
 import { Role } from "@/core/auth/roles";
 import { useCan } from "@/core/auth/useCan";
 import {
-    createUser,
-    getUserById,
-    updateUserById,
+  createUser,
+  getUserById,
+  updateUserById,
 } from "@/core/services/user.service";
 import type {
-    CreateUserFormValues,
-    UpdateUserFormValues,
+  CreateUserFormValues,
+  UpdateUserFormValues,
 } from "@/core/validation/user";
 
 export default function ManageUsersScreen() {
@@ -158,9 +158,11 @@ export default function ManageUsersScreen() {
           mode={isCreate ? "create" : "edit"}
           defaultValues={existingUser ?? undefined}
           allowedRoles={allowedRoles}
-          canEditPassword={isCreate || (!!existingUser && canEditSelf(existingUser.id))}
+          canEditPassword={
+            isCreate || (!!existingUser && canEditSelf(existingUser.id))
+          }
           onSubmit={handleSubmit}
-          onCancel={() => router.push("/users")}
+          onCancel={() => router.replace("/(app)/(tabs)/users")}
         />
       </View>
     </KeyboardAvoidingView>
