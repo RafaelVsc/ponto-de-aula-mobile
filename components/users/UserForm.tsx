@@ -1,30 +1,30 @@
-import { useMemo } from "react";
-import { Controller, useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import {
-  ScrollView,
-  Text,
-  View,
-  Pressable,
-  StyleProp,
-  ViewStyle,
-} from "react-native";
-import Toast from "react-native-toast-message";
-
+import { Button } from "@/components/ui/Button";
+import { Input } from "@/components/ui/Input";
 import { useColorScheme } from "@/components/useColorScheme";
 import Colors from "@/constants/Colors";
 import type { Role } from "@/core/auth/roles";
+import { getRoleLabel } from "@/core/auth/roles";
 import type { User } from "@/core/types";
 import {
-  CreateUserSchema,
+  buildUserSchema,
   type CreateUserFormValues,
   type UpdateUserFormValues,
-  UpdateUserSchema,
 } from "@/core/validation/user";
-import { Button } from "@/components/ui/Button";
-import { Input } from "@/components/ui/Input";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Picker } from "@react-native-picker/picker";
+import { useMemo } from "react";
+import { Controller, useForm } from "react-hook-form";
+import {
+  ScrollView,
+  StyleProp,
+  Text,
+  View,
+  ViewStyle
+} from "react-native";
+import Toast from "react-native-toast-message";
 
 type UserFormMode = "create" | "edit";
+type UserFormValues = CreateUserFormValues | UpdateUserFormValues;
 
 type UserFormProps = {
   mode: UserFormMode;
@@ -34,6 +34,7 @@ type UserFormProps = {
   onSubmit: (values: CreateUserFormValues | UpdateUserFormValues) => void;
   onCancel?: () => void;
   style?: StyleProp<ViewStyle>;
+  canEditPassword?: boolean;
 };
 
 export function UserForm({
@@ -44,30 +45,30 @@ export function UserForm({
   onSubmit,
   onCancel,
   style,
+  canEditPassword = true,
 }: UserFormProps) {
   const colorScheme = useColorScheme() ?? "light";
   const palette = Colors[colorScheme];
   const errorColor = palette?.destructive ?? "#dc2626";
 
-  const schema = mode === "create" ? CreateUserSchema : UpdateUserSchema;
-
-  const initialValues = useMemo<CreateUserFormValues | UpdateUserFormValues>(
+  const initialValues = useMemo<Partial<UserFormValues>>(
     () => ({
       name: defaultValues?.name ?? "",
       email: defaultValues?.email ?? "",
       username: defaultValues?.username ?? "",
-      password: "",
-      role: defaultValues?.role ?? allowedRoles[0] ?? "STUDENT",
+      // No edit, evita validar senha vazia; no create, começa vazio.
+      password: mode === "create" ? "" : undefined,
+      role: mode === "edit" ? defaultValues?.role : undefined,
     }),
-    [allowedRoles, defaultValues],
+    [defaultValues, mode],
   );
 
   const {
     control,
     handleSubmit,
     formState: { errors },
-  } = useForm<CreateUserFormValues | UpdateUserFormValues>({
-    resolver: zodResolver(schema),
+  } = useForm<UserFormValues>({
+    resolver: zodResolver(buildUserSchema(mode, allowedRoles)),
     defaultValues: initialValues,
   });
 
@@ -156,75 +157,105 @@ export function UserForm({
         <Controller
           control={control}
           name="username"
-          render={({ field: { onChange, onBlur, value } }) => (
-            <Input
-              label="Username"
-              placeholder="usuário"
-              onChangeText={onChange}
-              onBlur={onBlur}
-              value={value}
-              autoCapitalize="none"
-              error={errors.username?.message}
-              icon="at-sign"
-            />
-          )}
+          render={({ field: { onChange, onBlur, value } }) =>
+            mode === "edit" ? (
+              <View>
+                <Text className="mb-2 text-sm font-medium text-foreground">
+                  Username
+                </Text>
+                <Text className="text-base text-foreground">
+                  {value || "—"}
+                </Text>
+              </View>
+            ) : (
+              <Input
+                label="Username"
+                placeholder="usuário"
+                onChangeText={onChange}
+                onBlur={onBlur}
+                value={value}
+                autoCapitalize="none"
+                error={errors.username?.message}
+                icon="at-sign"
+              />
+            )
+          }
         />
-
-        <Controller
-          control={control}
-          name="password"
-          render={({ field: { onChange, onBlur, value } }) => (
-            <Input
-              label="Senha"
-              placeholder={mode === "create" ? "Crie uma senha" : "Deixe em branco para manter"}
-              onChangeText={onChange}
-              onBlur={onBlur}
-              value={value}
-              isPassword
-              error={errors.password?.message}
-              icon="lock"
-            />
-          )}
-        />
-
         <Controller
           control={control}
           name="role"
-          render={({ field: { value, onChange } }) => (
-            <View>
-              <Text className="mb-2 text-sm font-medium text-foreground">
-                Role
-              </Text>
-              <View className="flex-row flex-wrap gap-2">
-                {allowedRoles.map((role) => {
-                  const selected = value === role;
-                  return (
-                    <Pressable
-                      key={role}
-                      onPress={() => onChange(role)}
-                      className={`rounded-full border px-3 py-1 ${
-                        selected ? "bg-primary border-primary" : "border-border"
-                      }`}
-                    >
-                      <Text
-                        className={`text-xs font-semibold ${
-                          selected ? "text-white" : "text-foreground"
-                        }`}
-                      >
-                        {role}
-                      </Text>
-                    </Pressable>
-                  );
-                })}
-              </View>
-              {errors.role?.message && (
-                <Text className="mt-1 text-xs" style={{ color: errorColor }}>
-                  {errors.role.message}
+          render={({ field: { value, onChange } }) =>
+            mode === "edit" ? (
+              <View>
+                <Text className="mb-2 text-sm font-medium text-foreground">
+                  Função
                 </Text>
-              )}
-            </View>
-          )}
+                <Text className="text-base text-foreground">
+                  {getRoleLabel((value as Role) ?? "")}
+                </Text>
+                {errors.role?.message && (
+                  <Text className="mt-1 text-xs" style={{ color: errorColor }}>
+                    {errors.role.message}
+                  </Text>
+                )}
+              </View>
+            ) : (
+              <View>
+                <Text className="mb-2 text-sm font-medium text-foreground">
+                  Função
+                </Text>
+                <View className="rounded-lg border border-border bg-card">
+                  <Picker
+                    selectedValue={value ?? ""}
+                    onValueChange={onChange}
+                    prompt="Selecione"
+                  >
+                    <Picker.Item
+                      label="Selecione uma função..."
+                      value=""
+                      enabled={false}
+                    />
+                    {allowedRoles.map((role) => (
+                      <Picker.Item
+                        key={role}
+                        label={getRoleLabel(role)}
+                        value={role}
+                      />
+                    ))}
+                  </Picker>
+                </View>
+                {errors.role?.message && (
+                  <Text className="mt-1 text-xs" style={{ color: errorColor }}>
+                    {errors.role.message}
+                  </Text>
+                )}
+              </View>
+            )
+          }
         />
+
+        {(mode === "create" || canEditPassword) && (
+          <Controller
+            control={control}
+            name="password"
+            render={({ field: { onChange, onBlur, value } }) => (
+              <Input
+                label="Senha"
+                placeholder={
+                  mode === "create"
+                    ? "Crie uma senha"
+                    : "Deixe em branco para manter"
+                }
+                onChangeText={onChange}
+                onBlur={onBlur}
+                value={value ?? ""}
+                isPassword
+                error={errors.password?.message}
+                icon="lock"
+              />
+            )}
+          />
+        )}
       </View>
 
       <View className="mt-6 flex-row gap-3">

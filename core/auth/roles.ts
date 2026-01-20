@@ -7,5 +7,8 @@ export const ROLE_LABELS: Record<Role, string> = {
   STUDENT: "Aluno",
 };
 
-export const getRoleLabel = (role: Role | "ALL") =>
-  role === "ALL" ? "Todas as roles" : ROLE_LABELS[role];
+export const getRoleLabel = (role?: Role | "ALL" | "") => {
+  if (!role) return "—";
+  if (role === "ALL") return "Todas as roles";
+  return ROLE_LABELS[role] ?? String(role);
+};

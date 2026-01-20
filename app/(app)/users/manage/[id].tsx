@@ -29,7 +29,7 @@ export default function ManageUsersScreen() {
   const isCreate = !id || id === "new";
   const queryClient = useQueryClient();
   const navigation = useNavigation();
-  const { canManageRole, canManageUser } = useCan();
+  const { canManageRole, canManageUser, canEditSelf } = useCan();
   const insets = useSafeAreaInsets();
 
   const allowedRoles = useMemo<Role[]>(
@@ -158,6 +158,7 @@ export default function ManageUsersScreen() {
           mode={isCreate ? "create" : "edit"}
           defaultValues={existingUser ?? undefined}
           allowedRoles={allowedRoles}
+          canEditPassword={isCreate || (!!existingUser && canEditSelf(existingUser.id))}
           onSubmit={handleSubmit}
           onCancel={() => router.push("/users")}
         />

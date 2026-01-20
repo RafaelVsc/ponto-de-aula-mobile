@@ -1,3 +1,4 @@
+import type { Role } from "@/core/auth/roles";
 import { z } from "zod";
 
 const RolesEnum = z.enum(["ADMIN", "SECRETARY", "TEACHER", "STUDENT"]);
@@ -34,3 +35,19 @@ export const UpdateUserSchema = BaseUserSchema.extend({
 
 export type CreateUserFormValues = z.infer<typeof CreateUserSchema>;
 export type UpdateUserFormValues = z.infer<typeof UpdateUserSchema>;
+
+/**
+ * Constrói um schema dinâmico que respeita as roles permitidas para o usuário atual.
+ * No modo create exige seleção explícita; no edit apenas valida que a role existente é permitida.
+ */
+export function buildUserSchema(mode: "create" | "edit", allowedRoles: Role[]) {
+  const roleRule = z
+    .string()
+    .nonempty(mode === "create" ? "Selecione uma função" : "Role obrigatória")
+    .refine((val) => allowedRoles.includes(val as Role), {
+      message: "Role não permitida",
+    });
+
+  const base = mode === "create" ? CreateUserSchema : UpdateUserSchema;
+  return base.extend({ role: roleRule });
+}
