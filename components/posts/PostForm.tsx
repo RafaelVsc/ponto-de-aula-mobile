@@ -5,12 +5,13 @@ import { PostFormValues, PostSchema } from "@/core/validation/post";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useMemo } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { ScrollView, Text, TextInput, View } from "react-native";
+import { ScrollView, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Toast from "react-native-toast-message";
-import { Button } from "../ui/Button";
-import { Input } from "../ui/Input";
 import { RichTextEditor } from "../editor/RichTextEditor";
+import { Button } from "../ui/Button";
+import { Card } from "../ui/Card";
+import { Input } from "../ui/Input";
 
 type PostFormMode = "create" | "edit";
 
@@ -41,7 +42,7 @@ export function PostForm({
       imageUrl: defaultValues?.imageUrl ?? "",
       videoUrl: defaultValues?.videoUrl ?? "",
     }),
-    [defaultValues]
+    [defaultValues],
   );
 
   const {
@@ -80,7 +81,7 @@ export function PostForm({
           text2: firstError,
         });
       }
-    }
+    },
   );
 
   const handleSafeSubmit = async () => {
@@ -106,108 +107,110 @@ export function PostForm({
       keyboardShouldPersistTaps="handled"
       keyboardDismissMode="on-drag"
     >
-      <View className="gap-4">
-        {/* Título */}
-        <Controller
-          control={control}
-          name="title"
-          render={({ field: { onChange, onBlur, value } }) => (
-            <Input
-              label="Título"
-              placeholder="Digite o título do post"
-              onChangeText={onChange}
-              onBlur={onBlur}
-              value={value}
-              error={errors.title?.message}
-            />
-          )}
-        />
-        <Controller
-          control={control}
-          name="content"
-          render={({ field: { value, onChange } }) => (
-            <View>
-              <Text className="mb-1.5 text-sm font-medium text-foreground">
-                Conteúdo
-              </Text>
-              <RichTextEditor
-                initialHtml={value}
-                onChange={onChange}
-                style={{ minHeight: 280 }}
+      <Card>
+        <View className="gap-4">
+          {/* Título */}
+          <Controller
+            control={control}
+            name="title"
+            render={({ field: { onChange, onBlur, value } }) => (
+              <Input
+                label="Título"
+                placeholder="Digite o título do post"
+                onChangeText={onChange}
+                onBlur={onBlur}
+                value={value}
+                error={errors.title?.message}
               />
-              {errors.content?.message && (
-                <Text className="mt-1 text-xs" style={{ color: errorColor }}>
-                  {errors.content.message}
+            )}
+          />
+          <Controller
+            control={control}
+            name="content"
+            render={({ field: { value, onChange } }) => (
+              <View>
+                <Text className="mb-1.5 text-sm font-medium text-foreground">
+                  Conteúdo
                 </Text>
-              )}
-            </View>
-          )}
-        />
+                <RichTextEditor
+                  initialHtml={value}
+                  onChange={onChange}
+                  style={{ minHeight: 280 }}
+                />
+                {errors.content?.message && (
+                  <Text className="mt-1 text-xs" style={{ color: errorColor }}>
+                    {errors.content.message}
+                  </Text>
+                )}
+              </View>
+            )}
+          />
 
-        {/* Tags */}
-        <Controller
-          control={control}
-          name="tagsInput"
-          render={({ field: { onChange, onBlur, value } }) => (
-            <Input
-              label="Tags (separe por vírgula)"
-              placeholder="ex: react, mobile, aula"
-              onChangeText={onChange}
-              onBlur={onBlur}
-              value={value}
-              error={errors.tagsInput?.message}
-            />
-          )}
-        />
+          {/* Tags */}
+          <Controller
+            control={control}
+            name="tagsInput"
+            render={({ field: { onChange, onBlur, value } }) => (
+              <Input
+                label="Tags (separe por vírgula)"
+                placeholder="ex: react, mobile, aula"
+                onChangeText={onChange}
+                onBlur={onBlur}
+                value={value}
+                error={errors.tagsInput?.message}
+              />
+            )}
+          />
 
-        {/* {Imagem} */}
-        <Controller
-          control={control}
-          name="imageUrl"
-          render={({ field: { onChange, onBlur, value } }) => (
-            <Input
-              label="URL da imagem"
-              placeholder="https://..."
-              onChangeText={onChange}
-              onBlur={onBlur}
-              value={value}
-              error={errors.imageUrl?.message}
-            />
-          )}
-        />
+          {/* {Imagem} */}
+          <Controller
+            control={control}
+            name="imageUrl"
+            render={({ field: { onChange, onBlur, value } }) => (
+              <Input
+                label="URL da imagem"
+                placeholder="https://..."
+                onChangeText={onChange}
+                onBlur={onBlur}
+                value={value}
+                error={errors.imageUrl?.message}
+              />
+            )}
+          />
 
-        {/* {Vídeo} */}
-        <Controller
-          control={control}
-          name="videoUrl"
-          render={({ field: { onChange, onBlur, value } }) => (
-            <Input
-              label="URL do vídeo (YouTube)"
-              placeholder="https://youtube.com/watch?v=..."
-              onChangeText={onChange}
-              onBlur={onBlur}
-              value={value}
-              error={errors.videoUrl?.message}
-            />
-          )}
-        />
-      </View>
-      <View className="mt-6 flex-row gap-3">
-        <Button
-          label={mode === "create" ? "Publicar" : "Salvar alterações"}
-          onPress={handleSafeSubmit}
-          loading={submitting}
-          disabled={submitting}
-          className="flex-1"
-        />
-        <Button
-          label="Cancelar"
-          variant="secondary"
-          onPress={onCancel}
-          disabled={submitting}
-          className="flex-1"
-        />
-      </View>
+          {/* {Vídeo} */}
+          <Controller
+            control={control}
+            name="videoUrl"
+            render={({ field: { onChange, onBlur, value } }) => (
+              <Input
+                label="URL do vídeo (YouTube)"
+                placeholder="https://youtube.com/watch?v=..."
+                onChangeText={onChange}
+                onBlur={onBlur}
+                value={value}
+                error={errors.videoUrl?.message}
+              />
+            )}
+          />
+        </View>
+        <View className="mt-6 flex-row gap-3">
+          <Button
+            label={mode === "create" ? "Publicar" : "Salvar alterações"}
+            onPress={handleSafeSubmit}
+            loading={submitting}
+            disabled={submitting}
+            className="flex-1"
+          />
+          <Button
+            label="Cancelar"
+            variant="secondary"
+            onPress={onCancel}
+            disabled={submitting}
+            className="flex-1"
+          />
+        </View>
+      </Card>
     </ScrollView>
   );
 }

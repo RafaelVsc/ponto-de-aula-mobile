@@ -1,8 +1,7 @@
 import { Input } from "@/components/ui/Input";
 import { getRoleLabel } from "@/core/auth/roles";
 import type { Role } from "@/core/auth/roles";
-import type { User } from "@/core/types";
-import type { UserFormMode, UserFormValues } from "@/components/users/hooks/useUserForm";
+import type { UserFormFields, UserFormMode } from "@/components/users/hooks/useUserForm";
 import { Picker } from "@react-native-picker/picker";
 import type { Control, FieldErrors } from "react-hook-form";
 import { Controller } from "react-hook-form";
@@ -10,8 +9,8 @@ import { Button } from "@/components/ui/Button";
 import { Text, View } from "react-native";
 
 type FieldProps = {
-  control: Control<UserFormValues>;
-  errors: FieldErrors<UserFormValues>;
+  control: Control<UserFormFields>;
+  errors: FieldErrors<UserFormFields>;
 };
 
 export function NameField({ control, errors }: FieldProps) {

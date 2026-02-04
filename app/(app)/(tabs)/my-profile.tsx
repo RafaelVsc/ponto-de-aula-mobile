@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/Button";
+import { Card } from "@/components/ui/Card";
 import { ChangePasswordForm } from "@/components/users/ChangePasswordForm";
 import { UserForm } from "@/components/users/UserForm";
 import { useAuth } from "@/core/auth/AuthProvider";
@@ -85,14 +86,11 @@ export default function MyProfileScreen() {
         contentContainerStyle={{ paddingBottom: 24, gap: 12 }}
         keyboardShouldPersistTaps="handled"
       >
-        <View className="rounded-lg border border-border bg-card p-4 shadow-sm">
-          <Text className="mb-3 text-lg font-semibold text-foreground">
-            Meus dados
-          </Text>
-
+        <Card title="Meus dados">
           {isEditing ? (
             <UserForm
               mode="self-edit"
+              embedded
               defaultValues={profile}
               submitting={updateProfileMutation.isPending}
               onSubmit={(values) => updateProfileMutation.mutate(values)}
@@ -107,14 +105,11 @@ export default function MyProfileScreen() {
               onEdit={() => setIsEditing(true)}
             />
           )}
-        </View>
+        </Card>
 
-        <View className="rounded-lg border border-border bg-card p-4 shadow-sm">
-          <Text className="mb-3 text-lg font-semibold text-foreground">
-            Alterar senha
-          </Text>
+        <Card title="Alterar senha">
           <ChangePasswordForm />
-        </View>
+        </Card>
       </ScrollView>
     </KeyboardAvoidingView>
   );

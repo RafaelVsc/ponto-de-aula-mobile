@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 import { useForm } from "react-hook-form";
 
+import type { Role } from "@/core/auth/roles";
 import type { User } from "@/core/types";
 import {
   buildUserSchema,
@@ -8,16 +9,22 @@ import {
   type UpdateUserFormValues,
 } from "@/core/validation/user";
 import { zodResolver } from "@hookform/resolvers/zod";
-import type { Role } from "@/core/auth/roles";
 import Toast from "react-native-toast-message";
 
 export type UserFormMode = "create" | "edit" | "self-edit";
 export type UserFormValues = CreateUserFormValues | UpdateUserFormValues;
+export type UserFormFields = {
+  name: string;
+  email: string;
+  username?: string;
+  password?: string;
+  role?: Role;
+};
 
 function buildInitialValues(
   mode: UserFormMode,
   defaultValues?: Partial<User>,
-): Partial<UserFormValues> {
+): Partial<UserFormFields> {
   const isCreate = mode === "create";
   return {
     name: defaultValues?.name ?? "",
@@ -28,7 +35,7 @@ function buildInitialValues(
   };
 }
 
-function shapePayload(mode: UserFormMode, values: UserFormValues) {
+function shapePayload(mode: UserFormMode, values: UserFormFields) {
   const payload = { ...values } as any;
   const isCreate = mode === "create";
 
@@ -74,7 +81,7 @@ export function useUserForm({
     control,
     handleSubmit,
     formState: { errors },
-  } = useForm<UserFormValues>({
+  } = useForm<UserFormFields>({
     resolver: zodResolver(buildUserSchema(mode, allowedRoles)),
     defaultValues: initialValues,
   });

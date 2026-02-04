@@ -5,12 +5,14 @@ import {
   ActivityIndicator,
   KeyboardAvoidingView,
   Platform,
+  ScrollView,
   Text,
   View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Toast from "react-native-toast-message";
 
+import { Card } from "@/components/ui/Card";
 import { UserForm } from "@/components/users/UserForm";
 import { Role } from "@/core/auth/roles";
 import { useCan } from "@/core/auth/useCan";
@@ -153,18 +155,25 @@ export default function ManageUsersScreen() {
       behavior={Platform.OS === "ios" ? "padding" : undefined}
       keyboardVerticalOffset={insets.top + 64}
     >
-      <View className="flex-1 bg-background dark:bg-background-dark">
-        <UserForm
-          mode={isCreate ? "create" : "edit"}
-          defaultValues={existingUser ?? undefined}
-          allowedRoles={allowedRoles}
-          canEditPassword={
-            isCreate || (!!existingUser && canEditSelf(existingUser.id))
-          }
-          onSubmit={handleSubmit}
-          onCancel={() => router.replace("/(app)/(tabs)/users")}
-        />
-      </View>
+      <ScrollView
+        className="flex-1 bg-background dark:bg-background-dark px-4 py-6"
+        contentContainerStyle={{ paddingBottom: 24 + insets.bottom }}
+        keyboardShouldPersistTaps="handled"
+      >
+        <Card title={isCreate ? "Novo usuário" : "Editar usuário"}>
+          <UserForm
+            mode={isCreate ? "create" : "edit"}
+            embedded
+            defaultValues={existingUser ?? undefined}
+            allowedRoles={allowedRoles}
+            canEditPassword={
+              isCreate || (!!existingUser && canEditSelf(existingUser.id))
+            }
+            onSubmit={handleSubmit}
+            onCancel={() => router.replace("/(app)/(tabs)/users")}
+          />
+        </Card>
+      </ScrollView>
     </KeyboardAvoidingView>
   );
 }

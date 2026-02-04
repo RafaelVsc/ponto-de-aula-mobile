@@ -1,11 +1,7 @@
-import { Button } from "@/components/ui/Button";
 import { useColorScheme } from "@/components/useColorScheme";
-import Colors from "@/constants/Colors";
-import type { Role } from "@/core/auth/roles";
-import type { User } from "@/core/types";
 import {
-  FormActions,
   EmailField,
+  FormActions,
   NameField,
   PasswordField,
   RoleField,
@@ -17,6 +13,9 @@ import {
   type UserFormValues,
   useUserForm,
 } from "@/components/users/hooks/useUserForm";
+import Colors from "@/constants/Colors";
+import type { Role } from "@/core/auth/roles";
+import type { User } from "@/core/types";
 import { ScrollView, StyleProp, View, ViewStyle } from "react-native";
 
 type UserFormProps = {
@@ -28,6 +27,7 @@ type UserFormProps = {
   onCancel?: () => void;
   style?: StyleProp<ViewStyle>;
   canEditPassword?: boolean;
+  embedded?: boolean;
 };
 
 export function UserForm({
@@ -39,24 +39,22 @@ export function UserForm({
   onCancel,
   style,
   canEditPassword = true,
+  embedded = false,
 }: UserFormProps) {
-  const { control, errors, handleSafeSubmit, isCreate, isSelfEdit } = useUserForm({
-    mode,
-    defaultValues,
-    allowedRoles,
-    onSubmit,
-  });
+  const { control, errors, handleSafeSubmit, isCreate, isSelfEdit } =
+    useUserForm({
+      mode,
+      defaultValues,
+      allowedRoles,
+      onSubmit,
+    });
 
   const colorScheme = useColorScheme() ?? "light";
   const palette = Colors[colorScheme];
   const errorColor = palette?.destructive ?? "#dc2626";
 
-  return (
-    <ScrollView
-      className="bg-background px-4 py-6"
-      contentContainerStyle={[{ paddingBottom: 24 }, style]}
-      keyboardShouldPersistTaps="handled"
-    >
+  const content = (
+    <>
       <View className="gap-4">
         <NameField control={control} errors={errors} />
         <EmailField control={control} errors={errors} />
@@ -91,6 +89,20 @@ export function UserForm({
         onCancel={onCancel}
         getSubmitLabel={getSubmitLabel}
       />
+    </>
+  );
+
+  if (embedded) {
+    return <View style={style}>{content}</View>;
+  }
+
+  return (
+    <ScrollView
+      className="bg-background px-4 py-6"
+      contentContainerStyle={[{ paddingBottom: 24 }, style]}
+      keyboardShouldPersistTaps="handled"
+    >
+      {content}
     </ScrollView>
   );
 }
