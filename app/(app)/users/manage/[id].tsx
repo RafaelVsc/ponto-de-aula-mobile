@@ -170,7 +170,7 @@ export default function ManageUsersScreen() {
               isCreate || (!!existingUser && canEditSelf(existingUser.id))
             }
             onSubmit={handleSubmit}
-            onCancel={() => router.replace("/(app)/(tabs)/users")}
+            onCancel={() => router.back()}
           />
         </Card>
       </ScrollView>
