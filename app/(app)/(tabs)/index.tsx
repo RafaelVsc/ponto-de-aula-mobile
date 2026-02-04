@@ -1,8 +1,8 @@
 import { FilterModal } from "@/components/posts/FilterModal";
 import { PostCard } from "@/components/posts/PostCard";
+import { PostSearch } from "@/components/posts/PostSearch";
 import { Button } from "@/components/ui/Button";
 import { Fab } from "@/components/ui/Fab";
-import { Input } from "@/components/ui/Input";
 import { useAuth } from "@/core/auth/AuthProvider";
 import { can } from "@/core/auth/rbac";
 import { fetchAuthors, fetchPosts } from "@/core/services/post.service";
@@ -31,7 +31,10 @@ export default function FeedScreen() {
   const [filtersOpen, setFiltersOpen] = useState(false);
 
   useEffect(() => {
-    const t = setTimeout(() => setDebouncedSearch(search), 400);
+    const t = setTimeout(() => {
+      const term = search.trim();
+      setDebouncedSearch(term.length >= 3 ? term : "");
+    }, 400);
     return () => clearTimeout(t);
   }, [search]);
 
@@ -86,15 +89,7 @@ export default function FeedScreen() {
         Olá, {name}
       </Text>
       <View className="mb-4 gap-3">
-        <Input
-          className="w-full"
-          placeholder="Buscar posts..."
-          value={search}
-          onChangeText={setSearch}
-          accessibilityLabel="Buscar posts por título ou conteúdo"
-          accessibilityRole="search"
-          icon="search"
-        />
+        <PostSearch value={search} onChangeText={setSearch} />
         <Button
           variant={filtersActive ? "default" : "secondary"}
           label={filtersActive ? "Filtros (ativos)" : "Filtros"}
