@@ -1,4 +1,5 @@
 import { Fab } from "@/components/ui/Fab";
+import { ChipGroup } from "@/components/ui/ChipGroup";
 import type { Role } from "@/core/auth/roles";
 import { getRoleLabel } from "@/core/auth/roles";
 import { useCan } from "@/core/auth/useCan";
@@ -35,6 +36,10 @@ export default function UsersScreen() {
       ? ["TEACHER", "STUDENT"]
       : ["ADMIN", "SECRETARY", "TEACHER", "STUDENT"];
   const roleOptions: (Role | "ALL")[] = ["ALL", ...viewableRoles];
+  const roleChips = roleOptions.map((role) => ({
+    label: role === "ALL" ? "Todos" : getRoleLabel(role as Role),
+    value: role,
+  }));
 
   const { data, isLoading, isError, refetch, isRefetching } = useQuery({
     queryKey: ["users"],
@@ -146,23 +151,14 @@ export default function UsersScreen() {
         onChangeText={setSearch}
         className="mb-4 rounded-lg border border-border bg-card px-3 py-2 text-foreground"
       />
-      <View className="mb-3 flex-row flex-wrap gap-2">
-        {roleOptions.map((role) => {
-          const selected = roleFilter === role;
-          return (
-            <Pressable
-              key={role}
-              onPress={() => setRoleFilter(role)}
-              className={`rounded-full border px-3 py-1 ${selected ? "bg-primary border-primary" : "border-border"}`}
-            >
-              <Text
-                className={`text-xs font-semibold ${selected ? "text-white" : "text-foreground"}`}
-              >
-                {role === "ALL" ? "Todos" : getRoleLabel(role as Role)}
-              </Text>
-            </Pressable>
-          );
-        })}
+      <View className="mb-3">
+        <ChipGroup
+          options={roleChips}
+          value={roleFilter}
+          onChange={setRoleFilter}
+          size="sm"
+          wrap
+        />
       </View>
 
       <FlatList

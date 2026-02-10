@@ -2,10 +2,10 @@ import { Input } from "@/components/ui/Input";
 import { getRoleLabel } from "@/core/auth/roles";
 import type { Role } from "@/core/auth/roles";
 import type { UserFormFields, UserFormMode } from "@/components/users/hooks/useUserForm";
-import { Picker } from "@react-native-picker/picker";
 import type { Control, FieldErrors } from "react-hook-form";
 import { Controller } from "react-hook-form";
 import { Button } from "@/components/ui/Button";
+import { ChipGroup } from "@/components/ui/ChipGroup";
 import { Text, View } from "react-native";
 
 type FieldProps = {
@@ -126,26 +126,20 @@ export function RoleField({
             <Text className="mb-2 text-sm font-medium text-foreground">
               Função
             </Text>
-            <View className="rounded-lg border border-border bg-card">
-              <Picker
-                selectedValue={value ?? ""}
-                onValueChange={onChange}
-                prompt="Selecione"
-              >
-                <Picker.Item
-                  label="Selecione uma função..."
-                  value=""
-                  enabled={false}
-                />
-                {(allowedRoles ?? []).map((role) => (
-                  <Picker.Item
-                    key={role}
-                    label={getRoleLabel(role)}
-                    value={role}
-                  />
-                ))}
-              </Picker>
-            </View>
+            <Text className="mb-2 text-xs text-muted-foreground">
+              Selecione uma função
+            </Text>
+            <ChipGroup
+              options={(allowedRoles ?? []).map((role) => ({
+                label: getRoleLabel(role),
+                value: role,
+              }))}
+              value={value as Role | undefined}
+              onChange={onChange}
+              columns={allowedRoles && allowedRoles.length > 2 ? 2 : undefined}
+              wrap
+              size="md"
+            />
             {errors.role?.message && (
               <Text className="mt-1 text-xs" style={{ color: errorColor }}>
                 {errors.role.message}
