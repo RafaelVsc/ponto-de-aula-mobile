@@ -117,3 +117,7 @@ npm run start
 ## Backend
 
 Este app integra com a API do projeto Ponto de Aula. Certifique-se de que o backend esteja rodando e com autenticacao JWT ativa.
+
+- Repo da API: https://github.com/RafaelVsc/ponto-de-aula-api
+- URL base padrao: `http://localhost:3000` (Android emulador: `http://10.0.2.2:3000`; iOS/web: `http://127.0.0.1:3000`; device fisico: IP da maquina)
+- Credenciais seed: consulte o README do backend para a lista atualizada de usuários e senhas.
