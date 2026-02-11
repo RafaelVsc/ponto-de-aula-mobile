@@ -101,20 +101,20 @@ Observacao: grupos entre parenteses (`(auth)`, `(app)`) **nao aparecem na URL fi
 graph TD
     Root[App Root<br>app/_layout.tsx] --> CheckAuth{Usuario<br>autenticado?}
 
-    CheckAuth -->|Nao| AuthStack[Auth Stack<br>app/(auth)]
-    AuthStack --> Login[Login<br>(auth)/index.tsx]
+    CheckAuth -->|Nao| AuthStack["Auth Stack<br>app/(auth)"]
+    AuthStack --> Login["Login<br>(auth)/index.tsx"]
 
-    CheckAuth -->|Sim| AppStack[App Stack<br>app/(app)]
-    AppStack --> Tabs[Bottom Tabs<br>app/(app)/(tabs)]
+    CheckAuth -->|Sim| AppStack["App Stack<br>app/(app)"]
+    AppStack --> Tabs["Bottom Tabs<br>app/(app)/(tabs)"]
 
-    Tabs --> Home[Feed Posts<br>(tabs)/index.tsx]
-    Tabs --> MyPosts[Meus Posts<br>(tabs)/my-posts.tsx]
-    Tabs --> Users[Usuarios<br>(tabs)/users.tsx]
-    Tabs --> Profile[Perfil<br>(tabs)/my-profile.tsx]
+    Tabs --> Home["Feed Posts<br>(tabs)/index.tsx"]
+    Tabs --> MyPosts["Meus Posts<br>(tabs)/my-posts.tsx"]
+    Tabs --> Users["Usuarios<br>(tabs)/users.tsx"]
+    Tabs --> Profile["Perfil<br>(tabs)/my-profile.tsx"]
 
-    AppStack --> PostDetail[Post Detail<br>posts/[id].tsx]
-    AppStack --> PostManage[Criar/Editar Post<br>posts/manage/[id].tsx]
-    AppStack --> UserManage[Criar/Editar Usuario<br>users/manage/[id].tsx]
+    AppStack --> PostDetail["Post Detail<br>posts/[id].tsx"]
+    AppStack --> PostManage["Criar/Editar Post<br>posts/manage/[id].tsx"]
+    AppStack --> UserManage["Criar/Editar Usuario<br>users/manage/[id].tsx"]
 ```
 
 ### Diagrama de Arquitetura (Camadas)
@@ -528,21 +528,7 @@ api.interceptors.response.use(
 
 ---
 
-## 6. Melhorias Futuras
-
-- [ ] Offline-first com cache persistente
-- [ ] Push notifications
-- [ ] Upload de imagens/videos
-- [ ] Comentarios em posts
-- [ ] Compartilhamento nativo
-- [ ] Testes E2E (Maestro/Detox)
-- [ ] CI/CD com EAS Build + EAS Update
-- [ ] Analytics
-- [ ] Internacionalizacao (i18n)
-
----
-
-## 7. Conclusao
+## 6. Conclusao
 
 O projeto **Ponto de Aula Mobile** demonstra uma arquitetura mobile moderna e escalavel, com foco em:
 
