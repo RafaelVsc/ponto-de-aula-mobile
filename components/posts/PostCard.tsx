@@ -3,6 +3,7 @@ import { cn } from '@/lib/utils';
 import { Feather } from '@expo/vector-icons';
 import React from 'react';
 import { Image, Pressable, Text, View } from 'react-native';
+import { useCan } from '@/core/auth/useCan';
 const placeholder = require('@/assets/images/bg-ponto-de-aula.webp');
 
 interface PostCardProps {
@@ -22,6 +23,9 @@ export function PostCard({
   onEdit,
   onDelete,
 }: PostCardProps) {
+  const { can } = useCan();
+  const canEdit = can('update', 'Post', post);
+  const canDelete = can('delete', 'Post', post);
   // Formatação simples de data (caso não tenha date-fns)
   const formatDate = (dateStr?: string) => {
     if (!dateStr) return '';
@@ -107,7 +111,7 @@ export function PostCard({
         <View className="mt-4 flex-row items-center justify-end border-t border-border pt-3">
           {mode === 'management' ? (
             <View className="flex-row items-center gap-4">
-              {onEdit && (
+              {onEdit && canEdit && (
                 <Pressable
                   onPress={onEdit}
                   hitSlop={8}
@@ -117,7 +121,7 @@ export function PostCard({
                   <Text className="ml-1 text-xs font-semibold text-primary">Editar</Text>
                 </Pressable>
               )}
-              {onDelete && (
+              {onDelete && canDelete && (
                 <Pressable
                   onPress={onDelete}
                   hitSlop={8}

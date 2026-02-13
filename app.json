@@ -16,8 +16,11 @@
     "ios": {
       "supportsTablet": true,
       "infoPlist": {
-        "NSAppTransportSecurity": { "NSAllowsArbitraryLoads": true }
-      }
+        "NSAppTransportSecurity": {
+          "NSAllowsArbitraryLoads": true
+        }
+      },
+      "bundleIdentifier": "com.anonymous.pontodeaulamobile"
     },
     "android": {
       "adaptiveIcon": {
@@ -36,7 +39,8 @@
     },
     "plugins": [
       "expo-router",
-      "expo-secure-store"
+      "expo-secure-store",
+      "expo-font"
     ],
     "experiments": {
       "typedRoutes": true
