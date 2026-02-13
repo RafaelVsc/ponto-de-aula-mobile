@@ -37,7 +37,7 @@ export function RichTextEditor({ initialHtml, onChange, style }: Props) {
           setJsContent(js);
         }
       } catch (err) {
-        console.log("[RichTextEditor:asset-error]", err);
+        // silencioso; o toast visual do WebView é suficiente em dev
       } finally {
         if (!cancelled) setAssetsReady(true);
       }
@@ -146,12 +146,9 @@ export function RichTextEditor({ initialHtml, onChange, style }: Props) {
       originWhitelist={['*']}
       source={{ html: editorHtml }}
       onMessage={handleMessage}
-      onError={(event) =>
-        console.log(
-          "[RichTextEditor:webview-error]",
-          event.nativeEvent?.description ?? event.nativeEvent,
-        )
-      }
+      onError={(_event) => {
+        /* silencia erros de WebView; devtools já capturam se necessário */
+      }}
       javaScriptEnabled
       domStorageEnabled
       style={[

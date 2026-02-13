@@ -21,9 +21,6 @@ export async function login(payload: LoginPayload): Promise<LoginData> {
   const user = res?.data?.user;
 
   if (!token) {
-    if (__DEV__) {
-      console.log('[login:missing-token]', res);
-    }
     throw new Error('Token ausente na resposta de login');
   }
 
@@ -35,9 +32,7 @@ export async function login(payload: LoginPayload): Promise<LoginData> {
       const me = await fetchCurrentUser();
       resolvedUser = me;
     } catch (err) {
-      if (__DEV__) {
-        console.log('[login:fetch-me-error]', err);
-      }
+      // silently fallback; handled by missing user guard below
     }
   }
 

@@ -51,7 +51,7 @@ api.interceptors.request.use((config) => {
   if (__DEV__) {
     const method = (config.method ?? 'get').toUpperCase();
     const url = `${config.baseURL ?? ''}${config.url ?? ''}`;
-    console.log('[api:req]', method, url);
+    console.debug('[api:req]', method, url);
   }
   return config;
 });
@@ -63,16 +63,16 @@ api.interceptors.response.use(
     const data = error?.response?.data;
     if (__DEV__) {
       const url = error?.config?.url ?? '';
-      console.log('[api:err]', status ?? 'NO_STATUS', url, error?.message);
+      console.debug('[api:err]', status ?? 'NO_STATUS', url, error?.message);
       if (data) {
         try {
-          console.log('[api:err:data]', JSON.stringify(data));
+          console.debug('[api:err:data]', JSON.stringify(data));
         } catch {
-          console.log('[api:err:data]', data);
+          console.debug('[api:err:data]', data);
         }
       }
       if (error?.config?.data) {
-        console.log('[api:req:data]', error.config.data);
+        console.debug('[api:req:data]', error.config.data);
       }
     }
     if (status === 401) {

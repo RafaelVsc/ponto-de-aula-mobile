@@ -43,7 +43,6 @@ export default function FeedScreen() {
     queryFn: fetchAuthors,
   });
   const authors = authorsQuery.data?.data ?? [];
-  console.log("[authors]", authors.length);
   const {
     data,
     fetchNextPage,
