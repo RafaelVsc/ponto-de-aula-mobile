@@ -1,13 +1,13 @@
-import FontAwesome from "@expo/vector-icons/FontAwesome";
-import { Tabs, useRouter } from "expo-router";
-import React from "react";
-import { Pressable, View } from "react-native";
-
 import { useAppTheme } from "@/components/ThemeProvider";
 import { useClientOnlyValue } from "@/components/useClientOnlyValue";
 import { useColorScheme } from "@/components/useColorScheme";
 import Colors from "@/constants/Colors";
 import { useAuth } from "@/core/auth/AuthProvider";
+import { useCan } from "@/core/auth/useCan";
+import FontAwesome from "@expo/vector-icons/FontAwesome";
+import { Tabs, useRouter } from "expo-router";
+import React from "react";
+import { Pressable, View } from "react-native";
 
 // You can explore the built-in icon families and icons on the web at https://icons.expo.fyi/
 function TabBarIcon(props: {
@@ -20,20 +20,14 @@ function TabBarIcon(props: {
 export default function TabLayout() {
   const colorScheme = useColorScheme();
   const { toggleColorScheme } = useAppTheme();
-  const { logout, isAuthenticated, user } = useAuth();
+  const { logout, isAuthenticated } = useAuth();
   const router = useRouter();
+  const { canViewUsers, can } = useCan();
 
   if (!isAuthenticated) {
     // Layout não deve renderizar tabs quando deslogado; o root layout troca para stack guest.
     return null;
   }
-
-  // Roles com permissão para ver/gerenciar “Meus Posts”
-  const canSeeMyPosts = ["ADMIN", "AUTHOR", "TEACHER", "SECRETARY"].includes(
-    user?.role ?? ""
-  );
-  // Roles com permissão para a aba restrita (ex.: Users)
-  const canSeeUsers = ["ADMIN", "SECRETARY"].includes(user?.role ?? "");
 
   const handleLogout = async () => {
     await logout();
@@ -94,18 +88,16 @@ export default function TabLayout() {
             <TabBarIcon name="file-text" color={color} />
           ),
           // Esconde a aba para quem não tem permissão
-          href: canSeeMyPosts ? undefined : null,
+          href: can("create", "Post") ? undefined : null,
         }}
       />
       <Tabs.Screen
-      name="users"
-      options={{
-        title: "Usuários",
-        tabBarIcon: ({color}) => (
-          <TabBarIcon name="users" color={color} />
-        ),
-        href: canSeeUsers ? undefined : null,
-      }}
+        name="users"
+        options={{
+          title: "Usuários",
+          tabBarIcon: ({ color }) => <TabBarIcon name="users" color={color} />,
+          href: canViewUsers() ? undefined : null,
+        }}
       />
       <Tabs.Screen
         name="my-profile"

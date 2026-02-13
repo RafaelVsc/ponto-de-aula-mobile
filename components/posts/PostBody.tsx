@@ -10,10 +10,6 @@ type Props = {
   htmlContent?: string;
   plainContent?: string;
   formattedDate?: string | null;
-  canUpdate: boolean;
-  canRemove: boolean;
-  onEdit: () => void;
-  onDelete: () => void;
 };
 
 export function PostBody({

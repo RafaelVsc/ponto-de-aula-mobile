@@ -2,7 +2,7 @@
 import { PostCard } from "@/components/posts/PostCard";
 import { Fab } from "@/components/ui/Fab";
 import { useAuth } from "@/core/auth/AuthProvider";
-import { can } from "@/core/auth/rbac";
+import { useCan } from "@/core/auth/useCan";
 import { deletePost, fetchMyPosts } from "@/core/services/post.service";
 import { Feather } from "@expo/vector-icons";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -19,11 +19,12 @@ import Toast from "react-native-toast-message";
 
 export default function MyPostsScreen() {
   const { user } = useAuth();
+  const { can } = useCan();
   const authorId = user?.id;
   const name = user?.name ?? "usuário";
   const queryClient = useQueryClient();
 
-  const canCreate = can(user, "create", "Post");
+  const canCreate = can("create", "Post");
 
   const { data, isLoading, isRefetching, refetch, isError } = useQuery({
     queryKey: ["posts", "mine", authorId],
@@ -60,6 +61,16 @@ export default function MyPostsScreen() {
       },
     ]);
   };
+
+  if (!canCreate) {
+    return (
+      <View className="flex-1 items-center justify-center bg-background dark:bg-background-dark px-4">
+        <Text className="text-center text-base font-semibold text-muted-foreground dark:text-muted-foreground-dark">
+          Você não tem permissão para acessar esta área.
+        </Text>
+      </View>
+    );
+  }
 
   if (isLoading) {
     return (

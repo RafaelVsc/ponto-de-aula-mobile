@@ -53,7 +53,6 @@ export default function LoginScreen() {
       // O redirecionamento é handled pelo RootLayout ou AuthProvider
       router.replace('/(app)/(tabs)');
     } catch (err) {
-      console.log('[login:error]', err);
       Toast.show({
         type: 'error',
         text1: 'Erro ao entrar',

@@ -20,15 +20,15 @@ import { useAppTheme } from "@/components/ThemeProvider";
 import { Button } from "@/components/ui/Button";
 import { useColorScheme } from "@/components/useColorScheme";
 import Colors from "@/constants/Colors";
-import { useAuth } from "@/core/auth/AuthProvider";
-import { canDelete } from "@/core/auth/rbac";
+import { useCan } from "@/core/auth/useCan";
 import { deletePost, fetchPostById } from "@/core/services/post.service";
 import Feather from "@expo/vector-icons/Feather";
 import Toast from "react-native-toast-message";
 
 export default function PostDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
-  const { user } = useAuth();
+  const { can } = useCan();
+
   const { toggleColorScheme } = useAppTheme();
   const colorScheme = useColorScheme();
   const queryClient = useQueryClient();
@@ -40,6 +40,8 @@ export default function PostDetailScreen() {
   });
 
   const post = data?.data;
+  const canEdit = can("update", "Post", post);
+  const canDeleteAction = can("delete", "Post", post);
 
   if (isLoading)
     return (
@@ -62,10 +64,7 @@ export default function PostDetailScreen() {
   const formattedDate = post.createdAt
     ? new Intl.DateTimeFormat("pt-BR").format(new Date(post.createdAt))
     : null;
-  const isOwner = Boolean(user?.id && post.authorId && user.id === post.authorId);
-  const canUpdate = isOwner;
-  const canRemove = canDelete(post, user);
-  const showActions = canUpdate || canRemove;
+  const showActions = canEdit || canDeleteAction;
 
   const confirmDelete = () => {
     Alert.alert("Excluir post", "Deseja realmente excluir este post?", [
@@ -95,12 +94,12 @@ export default function PostDetailScreen() {
       onPress: () => void;
       destructive?: boolean;
     }[] = [];
-    if (canUpdate)
+    if (canEdit)
       options.push({
         label: "Editar",
         onPress: () => router.push(`/(app)/posts/manage/${post.id}`),
       });
-    if (canRemove)
+    if (canDeleteAction)
       options.push({
         label: "Excluir",
         onPress: confirmDelete,
@@ -118,15 +117,17 @@ export default function PostDetailScreen() {
         (idx) => {
           if (idx === options.length || idx < 0) return;
           options[idx]?.onPress();
-        }
+        },
       );
     } else {
       const buttons: AlertButton[] = [
-        ...options.map((o): AlertButton => ({
-          text: o.label,
-          onPress: o.onPress,
-          style: o.destructive ? "destructive" : "default",
-        })),
+        ...options.map(
+          (o): AlertButton => ({
+            text: o.label,
+            onPress: o.onPress,
+            style: o.destructive ? "destructive" : "default",
+          }),
+        ),
         { text: "Cancelar", style: "cancel" },
       ];
       Alert.alert("Ações", undefined, buttons);
@@ -184,10 +185,6 @@ export default function PostDetailScreen() {
         htmlContent={post.content}
         plainContent={plainContent}
         formattedDate={formattedDate}
-        canUpdate={canUpdate}
-        canRemove={canRemove}
-        onEdit={() => router.push(`/(app)/posts/manage/${post.id}`)}
-        onDelete={confirmDelete}
       />
     </ScrollView>
   );
