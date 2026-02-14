@@ -2,6 +2,10 @@
 
 Aplicativo mobile da plataforma Ponto de Aula, feito em React Native com Expo e Expo Router. O app consome a API REST existente e aplica RBAC no frontend para melhorar a UX, com a validacao final no backend.
 
+📺 Vídeo de apresentação: [https://youtu.be/wZFh_yyBmes](https://youtu.be/wZFh_yyBmes)
+
+![Thumbnail do vídeo](https://img.youtube.com/vi/wZFh_yyBmes/0.jpg)
+
 ## Funcionalidades
 
 - Autenticacao com sessao persistida.
@@ -87,22 +91,26 @@ A pasta `app/` eh a raiz do roteamento (Expo Router) e esta dividida da seguinte
 ## Setup
 
 1. Instale dependencias:
+
 ```
 npm install
 ```
 
 2. Configure variaveis de ambiente:
-Crie um arquivo `.env` na raiz:
+   Crie um arquivo `.env` na raiz:
+
 ```
 EXPO_PUBLIC_API_URL=http://SEU_IP_LOCAL:3000
 ```
 
 Observacoes:
+
 - Android emulator usa `http://10.0.2.2:3000`
 - iOS simulator/web usa `http://127.0.0.1:3000`
 - Em dispositivo fisico, use o IP da sua maquina na rede local
 
 3. Rode o app:
+
 ```
 npm run start
 ```
